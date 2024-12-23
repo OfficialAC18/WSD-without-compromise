@@ -1,10 +1,10 @@
 import os
 import torch
 import numpy as np
-from disentangled import DisentangledDataset
+from disentangled import DisentangledSampler
 
 
-class Dsprites(DisentangledDataset):
+class Dsprites(DisentangledSampler):
     """
     Dsprites dataset introudced in the paper, Beta-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework
     Link to the dataset: https://github.com/deepmind/dsprites-dataset.
@@ -40,6 +40,10 @@ class Dsprites(DisentangledDataset):
     def example_shape(self):
         return self.data_shape
     
+    @property
+    def num_examples(self):
+        return len(self.images)
+    
 
     def _sample_latent_factors(num,self):
         """Sample a batch of latent factors, Y"""
@@ -49,7 +53,7 @@ class Dsprites(DisentangledDataset):
     
 
     #Need to test out this function
-    def sample_observations_from_factors(self, num, k = -1, return_latents=False):
+    def sample_observations_from_factors(self, num, k = -1, observed_idx='constant', return_latents=False):
         """
         Generate the required paired examples for Weak Disentanglement
         Args:
@@ -86,16 +90,41 @@ class Dsprites(DisentangledDataset):
         all_factors_x1[:,self.latent_factor_indices] = common_factors
         all_factors_x2[:,self.latent_factor_indices] = common_factors
 
-        #Now we determine the k-different factors
+        #Now we determine the k-different factors (Might move this block to a seperate function)
         if k == -1:
-            k_observed = torch.randint(0, len(self.latent_factor_indices), (num,), generator=self.rand_generator)
+            if observed_idx == 'constant':
+                k_observed = torch.randint(0, len(self.latent_factor_indices), (1,), generator=self.rand_generator)
+            else:
+                k_observed = torch.randint(0, len(self.latent_factor_indices), (num,), generator=self.rand_generator)
         else:
             k_observed = torch.tensor(k)
+
+        #Since assumption is based on the fact that only a single factor is different
+        labels = []
         
         #Randomly sample the indices of the k-different factors
-        for idx in range(num):
-            diff_factors = torch.randint(0, len(self.latent_factor_indices), (k_observed[idx],), generator=self.rand_generator)
-            for i in diff_factors:
-                all_factors_x2[idx,i] = torch.randint(0, self.latents_sizes[i], (1,), generator=self.rand_generator)
+        if k_observed == 'constant':
+            diff_factors = torch.randint(0, len(self.latent_factor_indices), (num, k_observed), generator=self.rand_generator)
+            for idx in range(num):
+                for i in diff_factors:
+                    all_factors_x2[idx,i] = torch.randint(0, self.latents_sizes[i], (1,), generator=self.rand_generator)
+                labels.append(i)
+        else:
+            for idx in range(num):
+                diff_factors = torch.randint(0, len(self.latent_factor_indices), (1, k_observed[idx]), generator=self.rand_generator)
+                for i in diff_factors:
+                    all_factors_x2[idx,i] = torch.randint(0, self.latents_sizes[i], (1,), generator=self.rand_generator)
+                labels.append(i)   
 
-        return all_factors
+        #Get the corresponding images
+        images_x1 = self.images[torch.matmul(all_factors_x1.int(), self.factor_bases.int())]
+        images_x2 = self.images[torch.matmul(all_factors_x2.int(), self.factor_bases.int())]
+
+        #Concatenate the images across the first IMAGE dimension (Image shape should be (n, 1, 128, 64))
+        image_pairs = torch.concatenate((images_x1, images_x2), dim=1).unsqueeze(1)
+        #Convert the labels to a tensor
+        labels = torch.tensor(labels)
+
+        return image_pairs, labels, all_factors_x1, all_factors_x2 if return_latents else image_pairs, labels
+
+
