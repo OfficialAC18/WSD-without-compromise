@@ -14,8 +14,11 @@ class GroupVAEBase(VAE):
     Args:
         output_shape: tuple, shape of the output data
         num_channels: int, number of channels in the output data
+        labels: torch.Tensor, labels for weak supervision (Optional)
         latent_dim: int, dimension of the latent space
         beta: float, beta parameter for KL divergence
+        reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
+        subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
     """
     def __init__(self, output_shape, num_channels = 1, labels = None,
                 latent_dim=10, beta = 1.0, reconstruction_loss = 'bernoulli',subtract_true_image_entropy = False):
@@ -31,7 +34,7 @@ class GroupVAEBase(VAE):
     def regularizer(self, kl_loss):
         return self.beta * kl_loss 
     
-    def aggregate(self, z_mean_1, z_logvar_1, z_mean_2, z_logvar_2):
+    def aggregate(self, z_mean_1, z_logvar_1, z_mean_avg, z_logvar_avg, per_point_kl):
         pass
     
     def forward(self, x):
@@ -83,3 +86,39 @@ class GroupVAEBase(VAE):
         elbo = reconstruction_loss + kl_loss
 
         return x_recons_1, x_recons_2, loss, -elbo
+    
+
+class GroupVAELabels(GroupVAEBase):
+    """
+    Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
+    with additional averaging for weak supervision
+    Args:
+        output_shape: tuple, shape of the output data
+        num_channels: int, number of channels in the output data
+        labels: torch.Tensor, labels for weak supervision (Optional)
+        latent_dim: int, dimension of the latent space
+        beta: float, beta parameter for KL divergence
+        reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
+        subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
+    """
+
+    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl):
+        return losses.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, self.labels)
+
+
+class GroupVAEArgMax(GroupVAEBase):
+    """
+    Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
+    with additional averaging for weak supervision
+    Args:
+        output_shape: tuple, shape of the output data
+        num_channels: int, number of channels in the output data
+        labels: torch.Tensor, labels for weak supervision (Optional)
+        latent_dim: int, dimension of the latent space
+        beta: float, beta parameter for KL divergence
+        reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
+        subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
+    """
+
+    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl):
+        return losses.aggregate_max(z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl)
