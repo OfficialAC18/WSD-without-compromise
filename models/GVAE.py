@@ -1,10 +1,10 @@
 import torch
 
-
 from utils import losses
 from functools import partial
 
 from VAE import VAE
+
 
 
 class GroupVAEBase(VAE):
@@ -12,7 +12,7 @@ class GroupVAEBase(VAE):
     Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
     with additional averaging for weak supervision
     Args:
-        output_shape: tuple, shape of the output data
+        data_shape: tuple, shape of the output data
         num_channels: int, number of channels in the output data
         labels: torch.Tensor, labels for weak supervision (Optional)
         latent_dim: int, dimension of the latent space
@@ -20,9 +20,9 @@ class GroupVAEBase(VAE):
         reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
         subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
     """
-    def __init__(self, output_shape, num_channels = 1, labels = None,
+    def __init__(self, data_shape, num_channels = 1, labels = None,
                 latent_dim=10, beta = 1.0, reconstruction_loss = 'bernoulli',subtract_true_image_entropy = False):
-        super().__init__(output_shape, num_channels, latent_dim)
+        super().__init__(data_shape, num_channels, latent_dim)
         self.beta = beta
         self.labels = labels
         if reconstruction_loss == 'bernoulli':
@@ -93,7 +93,7 @@ class GroupVAELabels(GroupVAEBase):
     Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
     with additional averaging for weak supervision
     Args:
-        output_shape: tuple, shape of the output data
+        data_shape: tuple, shape of the output data
         num_channels: int, number of channels in the output data
         labels: torch.Tensor, labels for weak supervision (Optional)
         latent_dim: int, dimension of the latent space
@@ -111,7 +111,7 @@ class GroupVAEArgMax(GroupVAEBase):
     Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
     with additional averaging for weak supervision
     Args:
-        output_shape: tuple, shape of the output data
+        data_shape: tuple, shape of the output data
         num_channels: int, number of channels in the output data
         labels: torch.Tensor, labels for weak supervision (Optional)
         latent_dim: int, dimension of the latent space
