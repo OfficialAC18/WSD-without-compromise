@@ -91,3 +91,38 @@ class MLVAEBase(VAE):
 
         return x_recons_1, x_recons_2, loss, -elbo
 
+
+class MLVAELabels(MLVAEBase):
+    """
+    Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
+    with additional averaging for weak supervision
+    Args:
+        data_shape: tuple, shape of the output data
+        num_channels: int, number of channels in the output data
+        labels: torch.Tensor, labels for weak supervision (Optional)
+        latent_dim: int, dimension of the latent space
+        beta: float, beta parameter for KL divergence
+        reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
+        subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
+    """
+
+    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl):
+        return losses.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, self.labels)
+    
+
+class MLVAEArgMax(MLVAEBase):
+    """
+    Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
+    with additional averaging for weak supervision
+    Args:
+        data_shape: tuple, shape of the output data
+        num_channels: int, number of channels in the output data
+        labels: torch.Tensor, labels for weak supervision (Optional)
+        latent_dim: int, dimension of the latent space
+        beta: float, beta parameter for KL divergence
+        reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
+        subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
+    """
+
+    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl):
+        return losses.aggregate_max(z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl)
