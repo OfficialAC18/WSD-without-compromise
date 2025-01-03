@@ -9,7 +9,7 @@ class DisentangledSampler(ABC):
         pass
 
     @abstractmethod
-    def sample_latent_factors(self, random_state, num_samples):
+    def _sample_latent_factors(self, random_state, num_samples):
         pass
 
     @abstractmethod

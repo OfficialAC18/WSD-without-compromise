@@ -75,7 +75,16 @@ class Dsprites(DisentangledSampler):
 
         return images, factors if return_factors else images
 
-
+    def sample_observations_from_factors(self, factors, random_state):
+        """
+        Attain a set of observations from the dataset given the latent factors
+        Args:
+            factors: torch.Tensor, the latent factors
+            random_state: int, the random state for the generator
+        
+        Returns:
+            X: torch.Tensor, The set of examples
+        """
 
     #Need to test out this function
     def sample_paired_observations_from_factors(self, num, k = -1, observed_idx='constant', return_factors=False):
