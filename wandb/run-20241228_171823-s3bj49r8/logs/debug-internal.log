@@ -1,0 +1,11 @@
+{"time":"2024-12-28T17:18:23.622175+04:00","level":"INFO","msg":"using version","core version":"0.19.1"}
+{"time":"2024-12-28T17:18:23.62221+04:00","level":"INFO","msg":"created symlink","path":"/Users/akchunya/Projects/WSD-without-compromise/wandb/run-20241228_171823-s3bj49r8/logs/debug-core.log"}
+{"time":"2024-12-28T17:18:23.728906+04:00","level":"INFO","msg":"created new stream","id":"s3bj49r8"}
+{"time":"2024-12-28T17:18:23.728938+04:00","level":"INFO","msg":"stream: started","id":"s3bj49r8"}
+{"time":"2024-12-28T17:18:23.728952+04:00","level":"INFO","msg":"writer: Do: started","stream_id":"s3bj49r8"}
+{"time":"2024-12-28T17:18:23.728955+04:00","level":"INFO","msg":"sender: started","stream_id":"s3bj49r8"}
+{"time":"2024-12-28T17:18:23.728978+04:00","level":"INFO","msg":"handler: started","stream_id":"s3bj49r8"}
+{"time":"2024-12-28T17:18:24.080981+04:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-28T17:34:52.025208+04:00","level":"INFO","msg":"stream: closing","id":"s3bj49r8"}
+{"time":"2024-12-28T17:34:52.025244+04:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-28T17:34:52.025583+04:00","level":"INFO","msg":"Stopped system monitor"}

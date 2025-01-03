@@ -1,0 +1,33 @@
+Training Batch: 1/47: 0it [00:01, ?it/s]                                                                               | 0/100 [00:00<?, ?it/s]
+Epoch: 1/100:   0%|                                                                                                    | 0/100 [00:25<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 205, in <module>
+    train()
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 107, in train
+    output, z_mean, z_logvar = model(imgs)
+                               ^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/Projects/WSD-without-compromise/models/VAE.py", line 119, in forward
+    z_mean, z_logvar = self.encoder(x)
+                       ^^^^^^^^^^^^^^^
+  File "/Users/akchunya/Projects/WSD-without-compromise/models/VAE.py", line 126, in encoder
+    x = F.relu(self.enc_1(x))
+               ^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/conv.py", line 554, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/conv.py", line 549, in _conv_forward
+    return F.conv2d(
+           ^^^^^^^^^
+RuntimeError: Input type (unsigned char) and bias type (float) should be the same

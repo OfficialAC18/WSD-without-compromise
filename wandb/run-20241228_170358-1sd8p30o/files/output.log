@@ -1,0 +1,45 @@
+Epoch: 1/100:   0%|                     /Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/loss.py:608: UserWarning: Using a target size (torch.Size([64, 3, 831, 523])) that is different to the input size (torch.Size([64, 3, 523, 831])). This will likely lead to incorrect results due to broadcasting. Please ensure they have the same size.
+  return F.mse_loss(input, target, reduction=self.reduction)
+Training Batch: 1/47: 0it [00:01, ?it/s]
+Exception ignored in: <function _MultiProcessingDataLoaderIter.__del__ at 0x14978d300>
+Traceback (most recent call last):
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 1604, in __del__
+    self._shutdown_workers()
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 1568, in _shutdown_workers
+    w.join(timeout=_utils.MP_STATUS_CHECK_INTERVAL)
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/process.py", line 149, in join
+    res = self._popen.wait(timeout)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/popen_fork.py", line 40, in wait
+    if not wait([self.sentinel], timeout):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/connection.py", line 948, in wait
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt:
+Epoch: 1/100:   0%|                                                                                                    | 0/100 [00:29<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 209, in <module>
+    train()
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 117, in train
+    loss_recon_mean = loss_fn_recon_mean(output, imgs)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/modules/loss.py", line 608, in forward
+    return F.mse_loss(input, target, reduction=self.reduction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/nn/functional.py", line 3791, in mse_loss
+    expanded_input, expanded_target = torch.broadcast_tensors(input, target)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/functional.py", line 76, in broadcast_tensors
+    return _VF.broadcast_tensors(tensors)  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: The size of tensor a (831) must match the size of tensor b (523) at non-singleton dimension 3

@@ -1,0 +1,16 @@
+{"time":"2024-12-28T16:57:30.188341+04:00","level":"INFO","msg":"using version","core version":"0.19.1"}
+{"time":"2024-12-28T16:57:30.188457+04:00","level":"INFO","msg":"created symlink","path":"/Users/akchunya/Projects/WSD-without-compromise/wandb/run-20241228_165730-717oxjjd/logs/debug-core.log"}
+{"time":"2024-12-28T16:57:30.295384+04:00","level":"INFO","msg":"created new stream","id":"717oxjjd"}
+{"time":"2024-12-28T16:57:30.295413+04:00","level":"INFO","msg":"stream: started","id":"717oxjjd"}
+{"time":"2024-12-28T16:57:30.295427+04:00","level":"INFO","msg":"writer: Do: started","stream_id":"717oxjjd"}
+{"time":"2024-12-28T16:57:30.295445+04:00","level":"INFO","msg":"sender: started","stream_id":"717oxjjd"}
+{"time":"2024-12-28T16:57:30.295449+04:00","level":"INFO","msg":"handler: started","stream_id":"717oxjjd"}
+{"time":"2024-12-28T16:57:30.986851+04:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-28T16:57:52.663608+04:00","level":"INFO","msg":"stream: closing","id":"717oxjjd"}
+{"time":"2024-12-28T16:57:52.66363+04:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-28T16:57:52.663965+04:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-28T16:57:54.444157+04:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-12-28T16:57:55.269176+04:00","level":"INFO","msg":"handler: closed","stream_id":"717oxjjd"}
+{"time":"2024-12-28T16:57:55.269977+04:00","level":"INFO","msg":"sender: closed","stream_id":"717oxjjd"}
+{"time":"2024-12-28T16:57:55.269891+04:00","level":"INFO","msg":"writer: Close: closed","stream_id":"717oxjjd"}
+{"time":"2024-12-28T16:57:55.270626+04:00","level":"INFO","msg":"stream: closed","id":"717oxjjd"}

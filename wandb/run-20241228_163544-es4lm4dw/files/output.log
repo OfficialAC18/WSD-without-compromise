@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 102, in <module>
+    for epoch in tqdm(range(EPOCHS), f"Epoch: 1/{EPOCHS}"):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'module' object is not callable

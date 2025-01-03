@@ -1,0 +1,8 @@
+{"time":"2024-12-28T16:36:05.369324+04:00","level":"INFO","msg":"using version","core version":"0.19.1"}
+{"time":"2024-12-28T16:36:05.36935+04:00","level":"INFO","msg":"created symlink","path":"/Users/akchunya/Projects/WSD-without-compromise/wandb/run-20241228_163605-qr784wh9/logs/debug-core.log"}
+{"time":"2024-12-28T16:36:05.476394+04:00","level":"INFO","msg":"created new stream","id":"qr784wh9"}
+{"time":"2024-12-28T16:36:05.476567+04:00","level":"INFO","msg":"stream: started","id":"qr784wh9"}
+{"time":"2024-12-28T16:36:05.476787+04:00","level":"INFO","msg":"sender: started","stream_id":"qr784wh9"}
+{"time":"2024-12-28T16:36:05.476792+04:00","level":"INFO","msg":"handler: started","stream_id":"qr784wh9"}
+{"time":"2024-12-28T16:36:05.476792+04:00","level":"INFO","msg":"writer: Do: started","stream_id":"qr784wh9"}
+{"time":"2024-12-28T16:36:05.86084+04:00","level":"INFO","msg":"Starting system monitor"}

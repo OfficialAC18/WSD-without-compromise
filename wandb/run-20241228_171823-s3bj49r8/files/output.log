@@ -1,0 +1,49 @@
+Training Batch: 47it [00:51,  1.11s/it]                                                                                | 0/100 [00:00<?, ?it/s]
+Validation Batch: 12it [00:45,  3.77s/it]
+Training Batch: 47it [00:52,  1.12s/it]                                                                     | 1/100 [01:47<2:57:28, 107.56s/it]
+Validation Batch: 12it [00:45,  3.83s/it]
+Training Batch: 47it [00:52,  1.13s/it]                                                                     | 2/100 [03:36<2:56:52, 108.29s/it]
+Validation Batch: 12it [00:46,  3.88s/it]
+Training Batch: 47it [00:52,  1.12s/it]                                                                     | 3/100 [05:26<2:56:29, 109.17s/it]
+Validation Batch: 12it [00:46,  3.88s/it]
+Training Batch: 47it [00:52,  1.13s/it]                                                                     | 4/100 [07:16<2:55:19, 109.58s/it]
+Validation Batch: 12it [00:46,  3.88s/it]
+Training Batch: 47it [00:52,  1.12s/it]                                                                     | 5/100 [09:06<2:53:49, 109.78s/it]
+Validation Batch: 12it [00:46,  3.88s/it]
+Training Batch: 47it [00:53,  1.13s/it]                                                                     | 6/100 [10:56<2:51:55, 109.74s/it]
+Validation Batch: 12it [00:46,  3.90s/it]
+Training Batch: 47it [00:52,  1.13s/it]                                                                     | 7/100 [12:47<2:50:26, 109.96s/it]
+Validation Batch: 12it [00:46,  3.91s/it]
+Training Batch: 47it [00:52,  1.12s/it]                                                                     | 8/100 [14:37<2:48:47, 110.08s/it]
+Validation Batch: 12it [00:46,  3.86s/it]
+Epoch 1/100:   9%|████████                                                                                  | 9/100 [16:27<2:46:28, 109.77s/it]
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 209, in <module>
+    train()
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 103, in train
+    for i, data in tqdm(enumerate(train_dataloader), f"Training Batch"):
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 484, in __iter__
+    return self._get_iterator()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 415, in _get_iterator
+    return _MultiProcessingDataLoaderIter(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 1138, in __init__
+    w.start()
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/context.py", line 224, in _Popen
+    return _default_context.get_context().Process._Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/context.py", line 288, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/multiprocessing/popen_spawn_posix.py", line 62, in _launch
+    f.write(fp.getbuffer())
+KeyboardInterrupt

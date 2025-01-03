@@ -1,0 +1,12 @@
+Training Batch: 1/47: 46it [00:13,  3.53it/s]                                                                          | 0/100 [00:00<?, ?it/s]
+Epoch: 1/100:   0%|                                                                                                    | 0/100 [01:02<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 209, in <module>
+    train()
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 114, in train
+    loss = loss_fn(output, imgs, z_mean, z_logvar)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 33, in ELBOLoss
+    BCE = F.binary_cross_entropy(x_recons.reshape(BATCH_SIZE,-1),
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: shape '[64, -1]' is invalid for input of size 24772941

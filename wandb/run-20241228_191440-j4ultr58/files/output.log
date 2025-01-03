@@ -1,0 +1,31 @@
+Training Batch: 47it [00:17,  2.62it/s]                                                                         | 0/100 [00:00<?, ?it/s]
+Validation Batch: 12it [00:03,  3.79it/s]
+Training Batch: 47it [00:18,  2.52it/s]                                                                 | 1/100 [00:21<35:05, 21.27s/it]
+Validation Batch: 12it [00:03,  3.51it/s]
+Training Batch: 47it [00:18,  2.50it/s]                                                                 | 2/100 [00:43<35:37, 21.81s/it]
+Validation Batch: 12it [00:03,  3.53it/s]
+Training Batch: 47it [00:19,  2.47it/s]                                                                 | 3/100 [01:05<35:39, 22.05s/it]
+Validation Batch: 12it [00:03,  3.47it/s]
+Training Batch: 47it [00:19,  2.46it/s]                                                                 | 4/100 [01:28<35:39, 22.29s/it]
+Validation Batch: 12it [00:03,  3.48it/s]
+Training Batch: 47it [00:19,  2.45it/s]                                                                 | 5/100 [01:51<35:32, 22.44s/it]
+Validation Batch: 12it [00:03,  3.43it/s]
+Training Batch: 47it [00:19,  2.44it/s]                                                                 | 6/100 [02:13<35:21, 22.57s/it]
+Validation Batch: 12it [00:03,  3.61it/s]
+Training Batch: 47it [00:18,  2.55it/s]                                                                 | 7/100 [02:36<34:58, 22.57s/it]
+Validation Batch: 12it [00:03,  3.34it/s]
+Training Batch: 47it [00:20,  2.35it/s]                                                                 | 8/100 [02:58<34:19, 22.39s/it]
+Validation Batch: 12it [00:03,  3.29it/s]
+Training Batch: 47it [00:21,  2.21it/s]                                                                 | 9/100 [03:22<34:38, 22.84s/it]
+Validation Batch: 12it [00:03,  3.35it/s]
+Training Batch: 47it [00:21,  2.21it/s]                                                                | 10/100 [03:47<35:16, 23.51s/it]
+Validation Batch: 12it [00:03,  3.57it/s]
+Training Batch: 16it [00:07,  2.21it/s]                                                                | 11/100 [04:12<35:27, 23.91s/it]
+Epoch 1/100:  11%|█████████▎                                                                           | 11/100 [04:19<34:59, 23.59s/it]
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 214, in <module>
+    train()
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 131, in train
+    running_elbo_loss += loss.item()
+                         ^^^^^^^^^^^
+KeyboardInterrupt

@@ -1,0 +1,44 @@
+{
+  "os": "macOS-15.2-arm64-arm-64bit",
+  "python": "CPython 3.11.11",
+  "startedAt": "2024-12-28T14:35:05.271758Z",
+  "program": "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py",
+  "codePath": "tests/cards_latent_dim_text.py",
+  "git": {
+    "remote": "https://github.com/OfficialAC18/WSD-without-compromise.git",
+    "commit": "fac2b1a1d8503ba3a5b1f6249cd6533e12908e05"
+  },
+  "email": "akchunyachanchal@gmail.com",
+  "root": "/Users/akchunya/Projects/WSD-without-compromise",
+  "host": "Mac",
+  "executable": "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/bin/python",
+  "codePathLocal": "tests/cards_latent_dim_text.py",
+  "cpu_count": 16,
+  "cpu_count_logical": 16,
+  "disk": {
+    "/": {
+      "total": "994662584320",
+      "used": "146818879488"
+    },
+    "/System/Volumes/Data": {
+      "total": "994662584320",
+      "used": "146818879488"
+    }
+  },
+  "memory": {
+    "total": "68719476736"
+  },
+  "cpu": {
+    "count": 16,
+    "countLogical": 16
+  },
+  "apple": {
+    "name": "Apple M4 Max",
+    "ecpuCores": 4,
+    "pcpuCores": 12,
+    "gpuCores": 40,
+    "memoryGb": 64,
+    "swapTotalBytes": "8589934592",
+    "ramTotalBytes": "68719476736"
+  }
+}

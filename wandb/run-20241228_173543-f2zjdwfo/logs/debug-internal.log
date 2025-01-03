@@ -1,0 +1,17 @@
+{"time":"2024-12-28T17:35:43.967294+04:00","level":"INFO","msg":"using version","core version":"0.19.1"}
+{"time":"2024-12-28T17:35:43.967321+04:00","level":"INFO","msg":"created symlink","path":"/Users/akchunya/Projects/WSD-without-compromise/wandb/run-20241228_173543-f2zjdwfo/logs/debug-core.log"}
+{"time":"2024-12-28T17:35:44.074179+04:00","level":"INFO","msg":"created new stream","id":"f2zjdwfo"}
+{"time":"2024-12-28T17:35:44.074226+04:00","level":"INFO","msg":"stream: started","id":"f2zjdwfo"}
+{"time":"2024-12-28T17:35:44.074242+04:00","level":"INFO","msg":"writer: Do: started","stream_id":"f2zjdwfo"}
+{"time":"2024-12-28T17:35:44.074234+04:00","level":"INFO","msg":"handler: started","stream_id":"f2zjdwfo"}
+{"time":"2024-12-28T17:35:44.074259+04:00","level":"INFO","msg":"sender: started","stream_id":"f2zjdwfo"}
+{"time":"2024-12-28T17:35:44.870843+04:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-28T18:14:34.645547+04:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-28T18:14:34.64586+04:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-28T18:14:35.651215+04:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading wandb-summary.json","runtime_seconds":0.443780084,"progress":"659B/659B"},{"desc":"uploading output.log","runtime_seconds":0.15725675,"progress":"23.8KB/23.8KB"},{"desc":"uploading config.yaml","runtime_seconds":0.157230542,"progress":"704B/704B"}],"total_operations":3}}
+{"time":"2024-12-28T18:14:35.919673+04:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-12-28T18:14:37.393791+04:00","level":"INFO","msg":"stream: closing","id":"f2zjdwfo"}
+{"time":"2024-12-28T18:14:37.39384+04:00","level":"INFO","msg":"handler: closed","stream_id":"f2zjdwfo"}
+{"time":"2024-12-28T18:14:37.393861+04:00","level":"INFO","msg":"writer: Close: closed","stream_id":"f2zjdwfo"}
+{"time":"2024-12-28T18:14:37.393876+04:00","level":"INFO","msg":"sender: closed","stream_id":"f2zjdwfo"}
+{"time":"2024-12-28T18:14:37.394068+04:00","level":"INFO","msg":"stream: closed","id":"f2zjdwfo"}

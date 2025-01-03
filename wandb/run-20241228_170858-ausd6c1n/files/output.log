@@ -1,0 +1,9 @@
+Training Batch:: 0it [00:00, ?it/s]                                                                                    | 0/100 [00:00<?, ?it/s]
+Epoch: 1/100:   0%|                                                                                                    | 0/100 [00:20<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 210, in <module>
+    train()
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 106, in train
+    print(data.shape)
+          ^^^^^^^^^^
+AttributeError: 'list' object has no attribute 'shape'

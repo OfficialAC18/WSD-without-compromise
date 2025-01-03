@@ -1,0 +1,18 @@
+{"time":"2024-12-28T21:44:14.320852+04:00","level":"INFO","msg":"using version","core version":"0.19.1"}
+{"time":"2024-12-28T21:44:14.320885+04:00","level":"INFO","msg":"created symlink","path":"/Users/akchunya/Projects/WSD-without-compromise/wandb/run-20241228_214414-aauw49t3/logs/debug-core.log"}
+{"time":"2024-12-28T21:44:14.427626+04:00","level":"INFO","msg":"created new stream","id":"aauw49t3"}
+{"time":"2024-12-28T21:44:14.427657+04:00","level":"INFO","msg":"stream: started","id":"aauw49t3"}
+{"time":"2024-12-28T21:44:14.42768+04:00","level":"INFO","msg":"sender: started","stream_id":"aauw49t3"}
+{"time":"2024-12-28T21:44:14.427686+04:00","level":"INFO","msg":"writer: Do: started","stream_id":"aauw49t3"}
+{"time":"2024-12-28T21:44:14.42768+04:00","level":"INFO","msg":"handler: started","stream_id":"aauw49t3"}
+{"time":"2024-12-28T21:44:14.802076+04:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-12-28T22:25:12.583336+04:00","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/files/akchunyachanchal-king-s-college-london/VAE%20Latent%20Dimension%20Test/aauw49t3/file_stream\": read tcp 192.168.1.32:58651->35.186.228.49:443: read: connection reset by peer"}
+{"time":"2024-12-28T22:26:41.781304+04:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-12-28T22:26:41.781594+04:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-12-28T22:26:42.786929+04:00","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading wandb-summary.json","runtime_seconds":0.413772416,"progress":"670B/670B"},{"desc":"uploading history steps 5960-5999, summary, console lines 198-200","runtime_seconds":0.271208416},{"desc":"uploading config.yaml","runtime_seconds":0.155078125,"progress":"707B/707B"},{"desc":"uploading output.log","runtime_seconds":0.155063958,"progress":"22.5KB/22.5KB"}],"total_operations":4}}
+{"time":"2024-12-28T22:26:43.058714+04:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-12-28T22:26:44.376482+04:00","level":"INFO","msg":"stream: closing","id":"aauw49t3"}
+{"time":"2024-12-28T22:26:44.376587+04:00","level":"INFO","msg":"handler: closed","stream_id":"aauw49t3"}
+{"time":"2024-12-28T22:26:44.376608+04:00","level":"INFO","msg":"writer: Close: closed","stream_id":"aauw49t3"}
+{"time":"2024-12-28T22:26:44.3767+04:00","level":"INFO","msg":"sender: closed","stream_id":"aauw49t3"}
+{"time":"2024-12-28T22:26:44.376922+04:00","level":"INFO","msg":"stream: closed","id":"aauw49t3"}

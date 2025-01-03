@@ -1,0 +1,16 @@
+{
+  "os": "macOS-15.2-arm64-arm-64bit",
+  "python": "CPython 3.11.11",
+  "startedAt": "2024-12-28T12:29:49.205952Z",
+  "program": "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py",
+  "codePath": "tests/cards_latent_dim_text.py",
+  "git": {
+    "remote": "https://github.com/OfficialAC18/WSD-without-compromise.git",
+    "commit": "fac2b1a1d8503ba3a5b1f6249cd6533e12908e05"
+  },
+  "email": "akchunyachanchal@gmail.com",
+  "root": "/Users/akchunya/Projects/WSD-without-compromise",
+  "host": "Mac",
+  "executable": "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/bin/python",
+  "codePathLocal": "tests/cards_latent_dim_text.py"
+}

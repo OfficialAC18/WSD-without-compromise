@@ -1,0 +1,18 @@
+Training Batch: 47it [00:52,  1.11s/it]                                                                                | 0/100 [00:00<?, ?it/s]
+Validation Batch: 12it [00:45,  3.79s/it]
+Epoch 1/100:   0%|                                                                                                     | 0/100 [01:47<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 209, in <module>
+    train()
+  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 191, in train
+    torch.save(model.state_dict(), os.path.join(MODEL_PATH,'best_model.pth'))
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/serialization.py", line 849, in save
+    with _open_zipfile_writer(f) as opened_zipfile:
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/serialization.py", line 716, in _open_zipfile_writer
+    return container(name_or_buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/akchunya/miniforge3/envs/WSD-WO-COMp/lib/python3.11/site-packages/torch/serialization.py", line 687, in __init__
+    super().__init__(torch._C.PyTorchFileWriter(self.name))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Parent directory trained_models/VAE LD-10 does not exist.

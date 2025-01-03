@@ -6,6 +6,7 @@ from functools import partial
 from VAE import VAE
 
 
+
 class MLVAEBase(VAE):
     """
     Beta-VAE with averaging from https://arxiv.org/abs/1809.02383.
