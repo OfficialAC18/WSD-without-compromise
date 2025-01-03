@@ -7,7 +7,7 @@ def compute_dci(ground_truth_data,
                 num_train,
                 num_test,
                 surrogate_model = 'gbt',
-                bath_size = 32):
+                batch_size = 32):
     """
     Compute disentanglement, completeness and informativeness scores (DCI).
     Args:
@@ -25,14 +25,40 @@ def compute_dci(ground_truth_data,
         for the train and test sets.
     """
     #Generate the train set
-    inputs_train, y_train = ground_truth_data.sample_observations(num_train,
-                                                             return_factors=True)
-    x_train = encoder_function(inputs_train)
+    num_batches = num_train//batch_size
+    last_batch = num_train - num_batches*batch_size
+
+    for idx in range(num_batches + last_batch):
+        if idx == num_batches:
+            inputs_batch_train, y_batch_train = ground_truth_data.sample_observations(last_batch,    
+                                                         return_factors=True)
+        else:
+            inputs_batch_train, y_batch_train = ground_truth_data.sample_observations(batch_size,    
+                                                         return_factors=True)
+        if idx > 0:
+            x_train = torch.cat((x_train, encoder_function(inputs_batch_train)))
+            y_train = torch.cat((y_train, y_batch_train))
+        else:
+            x_train = encoder_function(inputs_batch_train)
+            y_train = y_batch_train
 
     #Generate the test set
-    inputs_test, y_test = ground_truth_data.sample_observations(num_test,
-                                                           return_factors=True)
-    x_test = encoder_function(inputs_test)
+    num_batches = num_test//batch_size
+    last_batch = num_test - num_batches*batch_size
+
+    for idx in range(num_batches + last_batch):
+        if idx == num_batches:
+            inputs_batch_test, y_batch_test = ground_truth_data.sample_observations(last_batch,    
+                                                         return_factors=True)
+        else:
+            inputs_batch_test, y_batch_test = ground_truth_data.sample_observations(batch_size,    
+                                                         return_factors=True)
+        if idx > 0:
+            x_test = torch.cat((x_test, encoder_function(inputs_batch_test)))
+            y_test = torch.cat((y_test, y_batch_test))
+        else:
+            x_test = encoder_function(inputs_batch_test)
+            y_test = y_batch_test
 
     assert x_train.shape[0] == num_train
     assert y_train.shape[0] == num_train
