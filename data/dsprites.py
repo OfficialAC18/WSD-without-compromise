@@ -22,7 +22,7 @@ class Dsprites(DisentangledSampler):
         self.data = np.load(os.path.join(data_dir,'dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz'))     
         self.latent_factor_indices = list(range(6)) if latent_factor_indices is None else latent_factor_indices
         self.images = torch.from_numpy(self.data['imgs'])
-        self.latents_sizes = self.data['metadata'][()]['latents_sizes']
+        self.latents_sizes = torch.from_numpy(self.data['metadata'][()]['latents_sizes'])
         self.observation_factor_indices = [i for i in range(len(self.latents_sizes)) if i not in self.latent_factor_indices]
         self.data_shape = self.images[0].unsqueeze(0).shape
         self.factor_bases = torch.prod(torch.Tensor(self.latents_sizes))/torch.cumprod(torch.Tensor(self.latents_sizes)).item()
@@ -52,8 +52,33 @@ class Dsprites(DisentangledSampler):
         return factors
     
 
+    def sample_observations(self, num, return_latents=True):
+        """
+        Attain a set of observations from the dataset
+        Args:
+            num: int, number of examples to generate
+            return_latents: bool, whether to return the latent factors as well
+        
+        Returns:
+            (X,Y): torch.Tensor, The set of examples and their corresponding latent factors
+        """
+        latents = self._sample_latent_factors(num)
+        all_factors = torch.zeros(num, len(self.latents_sizes))
+
+        rem_factors = torch.randn(num, len(self.observation_factor_indices), generator=self.rand_generator)
+        rem_factors = (rem_factors*torch.index_select(self.latents_sizes, 0, self.observation_factor_indices)).floor().long()
+
+        all_factors[:,self.latent_factor_indices] = latents
+        all_factors[:,self.observation_factor_indices] = rem_factors
+
+        images = self.images[torch.matmul(all_factors.int(), self.factor_bases.int())]
+
+        return images, latents if return_latents else images
+
+
+
     #Need to test out this function
-    def sample_observations_from_factors(self, num, k = -1, observed_idx='constant', return_latents=False):
+    def sample_paired_observations_from_factors(self, num, k = -1, observed_idx='constant', return_latents=False):
         """
         Generate the required paired examples for Weak Disentanglement
         Args:
