@@ -5,20 +5,34 @@ from abc import ABC, abstractmethod
 
 class DisentangledSampler(ABC):
     @abstractmethod
-    def num_factors(self):
-        pass
-
+    def num_observed_latent_factors(self):
+        raise NotImplementedError()
+    
     @abstractmethod
-    def _sample_latent_factors(self, random_state, num_samples):
-        pass
+    def latent_factor_sizes(self):
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def example_shape(self):
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def sample_latent_factors(self, random_state, num_samples):
+        raise NotImplementedError()
 
     @abstractmethod
     def sample_observations_from_factors(self, factors, random_state):
-        pass
+        raise NotImplementedError()
+    
+    @abstractmethod
+    def sample(self, num):
+        latent_factors = self.sample_latent_factors(num)
+        observations = self.sample_observations_from_factors(latent_factors)
+        return observations, latent_factors
 
     @abstractmethod
     def num_examples(self):
-        pass
+        raise NotImplementedError()
 
 
 
