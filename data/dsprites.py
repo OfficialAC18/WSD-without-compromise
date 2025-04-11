@@ -85,6 +85,18 @@ class Dsprites(DisentangledSampler):
         Returns:
             X: torch.Tensor, The set of examples
         """
+        all_factors = torch.zeros(factors.shape[0], len(self.latents_sizes))
+
+        rem_factors = torch.randn(factors.shape[0], len(self.observation_factor_indices), generator=self.rand_generator)
+        rem_factors = (rem_factors*torch.index_select(self.latents_sizes, 0, self.observation_factor_indices)).floor().long()
+
+        all_factors[:,self.latent_factor_indices] = factors
+        all_factors[:,self.observation_factor_indices] = rem_factors
+
+        images = self.images[torch.matmul(all_factors.int(), self.factor_bases.int())]
+
+        return images
+
 
     #Need to test out this function
     def sample_paired_observations_from_factors(self, num, k = -1, observed_idx='constant', return_factors=False):
