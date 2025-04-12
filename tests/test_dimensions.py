@@ -10,7 +10,7 @@ from models.VAE import VAE
 #2. Check the shape of the latent representation. (Done)
 #3. Check that the mean and variance are not the exact same. (Done)
 #5. Check that the mean and variance are not None. (Done)
-#6. Check that the returned mean and variance values are the same as the ones stored in the object.
+#6. Check that the returned mean and variance values are the same as the ones stored in the object. (Done)
 mps_device = torch.device('mps')
 
 @pytest.mark.parametrize('data_shape, latent_dim',[
