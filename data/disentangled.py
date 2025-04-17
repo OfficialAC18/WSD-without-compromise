@@ -1,4 +1,3 @@
-import torch
 from torch.utils.data import Dataset
 from abc import ABC, abstractmethod
 
@@ -19,16 +18,10 @@ class DisentangledSampler(ABC):
     @abstractmethod
     def sample_latent_factors(self, random_state, num_samples):
         raise NotImplementedError()
-
-    @abstractmethod
-    def sample_observations_from_factors(self, factors, random_state):
-        raise NotImplementedError()
     
     @abstractmethod
-    def sample(self, num):
-        latent_factors = self.sample_latent_factors(num)
-        observations = self.sample_observations_from_factors(latent_factors)
-        return observations, latent_factors
+    def sample_observations(self, num, observed_factors = None, return_factors = True):
+        raise NotImplementedError()
 
     @abstractmethod
     def num_examples(self):

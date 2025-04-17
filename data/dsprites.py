@@ -1,7 +1,7 @@
 import os
 import torch
 import numpy as np
-from disentangled import DisentangledSampler
+from data.disentangled import DisentangledSampler
 
 
 class Dsprites(DisentangledSampler):
@@ -58,7 +58,7 @@ class Dsprites(DisentangledSampler):
             factors: torch.Tensor, The set of latent factors
         """
         factors = torch.rand(num, len(self.observed_latent_factor_indices), generator=self.rand_generator)
-        factors = (factors*torch.index_select(self.latents_sizes, 0, torch.Tensor(self.observed_latent_factor_indices))).int().floor()
+        factors = (factors*torch.index_select(self.latents_sizes, 0, torch.tensor(self.observed_latent_factor_indices))).int().floor()
         return factors
     
     def sample_full_latent_vector(self, observed_latent_factors):
@@ -72,17 +72,17 @@ class Dsprites(DisentangledSampler):
             all_factors: torch.Tensor, The set of full latent factors, Y' U (Y-Y')
         """
         num_samples = observed_latent_factors.shape[0]
-        all_factors = torch.zeros(num_samples, len(self.latents_sizes))
+        all_factors = torch.zeros(num_samples, len(self.latents_sizes)).int()
         all_factors[:,self.observed_latent_factor_indices] = observed_latent_factors
         
         if len(self.unobserved_latent_factor_indices) > 0:
-            all_factors[:,self.unobserved_latent_factor_indices] = torch.rand(num_samples, len(self.unobserved_latent_factor_indices), generator=self.rand_generator)
-            all_factors[:,self.unobserved_latent_factor_indices] = (all_factors[:,self.unobserved_latent_factor_indices]*torch.index_select(self.latents_sizes, 0, torch.Tensor(self.unobserved_latent_factor_indices))).int().floor()
+            rem_unobserved_latent_factors = torch.rand(num_samples, len(self.unobserved_latent_factor_indices), generator=self.rand_generator)
+            all_factors[:,self.unobserved_latent_factor_indices] = (rem_unobserved_latent_factors*torch.index_select(self.latents_sizes, 0, torch.tensor(self.unobserved_latent_factor_indices))).int().floor()
         
         #Final sanity check
         assert torch.all(all_factors[:,self.observed_latent_factor_indices] == observed_latent_factors), "The observed latent factors are not correctly placed"
         
-        return all_factors
+        return all_factors.int()
 
     def sample_observations(self, num,
                             observed_factors = None, 
@@ -144,9 +144,9 @@ class Dsprites(DisentangledSampler):
         #Randomly sample the indices of the k-different factors, remember that this is for the observed latent factors
         observed_indices = torch.Tensor(self.observed_latent_factor_indices)
         if k_observed == 'constant':
-            diff_factors = torch.stack([observed_indices[torch.randperm(len(observed_indices), generator=self.rand_generator)][:k_observed]] for _ in range(num))
+            diff_factors = torch.stack([observed_indices[torch.randperm(len(observed_indices), generator=self.rand_generator)][:k_observed] for _ in range(num)])
         else:
-            diff_factors = torch.stack([observed_indices[torch.randperm(len(observed_indices), generator=self.rand_generator)][:k_observed[idx_inner]]] for idx_inner in range(num))
+            diff_factors = torch.stack([observed_indices[torch.randperm(len(observed_indices), generator=self.rand_generator)][:k_observed[idx_inner]] for idx_inner in range(num)])
     
         for idx in range(num):
             for i in diff_factors[idx]:

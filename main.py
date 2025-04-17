@@ -20,6 +20,7 @@ parser.add_argument('--observed_idx', type=str, default='constant', help='Index 
 parser.add_argument('--aggregate', type=str, default='argmax', help='Aggregation method for the VAE')
 parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer')
 parser.add_argument('--batch_size', type=int, default=64, help='Batch size for training')
+parser.add_argument('--num_train_steps', type=int, default=100000, help='Number of training steps')
 
 
 def main(args):

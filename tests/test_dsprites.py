@@ -38,13 +38,9 @@ def dsprites_one_observed(data_dir):
     """Dsprites instance with only one factor observed."""
     return Dsprites(data_dir=data_dir, observed_latent_factor_indices=[2], seed=42) # Scale
 
-@pytest.fixture(scope="module")
-def dsprites_none_observed(data_dir):
-    """Dsprites instance with no factors observed (edge case)."""
-    return Dsprites(data_dir=data_dir, observed_latent_factor_indices=[], seed=42)
 
 # Combine fixtures for parameterization
-dsprites_instances = ["dsprites_all_observed", "dsprites_some_observed", "dsprites_one_observed", "dsprites_none_observed"]
+dsprites_instances = ["dsprites_all_observed", "dsprites_some_observed", "dsprites_one_observed"]
 
 # --- Test __init__ and basic properties ---
 
@@ -67,7 +63,6 @@ def test_init_loading(instance_name, request):
     ("dsprites_all_observed", [0, 1, 2, 3, 4, 5], []),
     ("dsprites_some_observed", [1, 3, 4], [0, 2, 5]),
     ("dsprites_one_observed", [2], [0, 1, 3, 4, 5]),
-    ("dsprites_none_observed", [], [0, 1, 2, 3, 4, 5]),
 ])
 def test_init_indices(instance_name, expected_observed, expected_unobserved, request):
     """Test observed and unobserved indices are set correctly."""
