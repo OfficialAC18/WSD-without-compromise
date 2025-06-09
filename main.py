@@ -45,7 +45,6 @@ def main(args):
                             num_workers=1)
     
     
-    
     #Load the model
     if args.model == 'ML_VAE':
         if args.aggregate == 'argmax':
@@ -71,9 +70,6 @@ def main(args):
                                    latent_dim=args.latent_dim,
                                    num_channels=dataset.sampler.data_shape[0],
                                    labels=dataset.sampler) #This is a proxy, not correct, need to refactor
-
-
-    
 
 
     return

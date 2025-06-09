@@ -40,7 +40,7 @@ class DisentangledDataset(Dataset):
         return self.sampler.num_examples
 
     def __getitem__(self, idx):
-        return self.sampler.sample_observations_from_factors(num = len(idx),
+        return self.sampler.sample_paired_observations_from_factors(num = len(idx),
                                                              k = self.k_observed,
                                                              observed_idx = self.observed_idx,
                                                              return_latents = self.return_latents)

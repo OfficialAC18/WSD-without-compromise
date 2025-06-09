@@ -114,6 +114,7 @@ class Dsprites(DisentangledSampler):
         Args:
             num: int, number of examples to generate
             k: int, number of uncommon factors betweem X1 and X2, if set to -1, it is randomly sampled between 0 and len(observed_latent_factor_indices)
+            observed_idx: str, 'constant' or 'random', if 'constant', then the k-different factors are the same for all pairs, if 'random', then the k-different factors are randomly sampled for each pair
             return_latents: bool, whether to return the latent factors as well
         
         Returns:
