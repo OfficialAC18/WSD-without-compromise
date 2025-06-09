@@ -19,7 +19,7 @@ class GaussianEncoderDecoderModel(torch.nn.Module, ABC):
             mu: torch.Tensor, mean of the latent distribution
             log_var: torch.Tensor, log variance of the latent distribution
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def decoder(self, z):
@@ -30,7 +30,17 @@ class GaussianEncoderDecoderModel(torch.nn.Module, ABC):
         Returns:
             x: torch.Tensor, reconstructed data
         """
-        pass
+        raise NotImplementedError()
+
+    @abstractmethod
+    def reparameterize(self, mu, log_var):
+        """
+        Reparameterization trick
+        Args:
+            mu: torch.Tensor, mean of the latent distribution
+            log_var: torch.Tensor, log variance of the latent distribution
+        """
+        raise NotImplementedError()
 
 
 

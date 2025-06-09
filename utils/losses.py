@@ -53,7 +53,7 @@ def compute_gaussian_kl(z_mean, z_logvar):
     Returns:
         kl_loss: torch.Tensor, KL divergence
     """
-    kl_loss = torch.mean(0.5 * torch.sum(z_mean**2 + torch.exp(z_logvar) - z_logvar - 1, dim=1))
+    kl_loss = 0.5 * torch.mean(torch.sum(z_mean**2 + torch.exp(z_logvar) - z_logvar - 1, dim=1))
     return kl_loss
 
 def compute_kl(z_mean_1, z_logvar_1, z_mean_2, z_logvar_2):
@@ -69,4 +69,4 @@ def compute_kl(z_mean_1, z_logvar_1, z_mean_2, z_logvar_2):
     """
     var_1 = torch.exp(z_logvar_1)
     var_2 = torch.exp(z_logvar_2)
-    return var_1/var_2 + (z_mean_1 - z_mean_2)**2/var_2 - 1 + z_logvar_2 - z_logvar_1
+    return var_1/var_2 + (z_mean_2 - z_mean_1)**2/var_2 - 1 + z_logvar_2 - z_logvar_1

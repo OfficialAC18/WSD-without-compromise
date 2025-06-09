@@ -14,13 +14,13 @@ class MLVAEBase(VAE):
     Args:
         data_shape: tuple, shape of the output data
         num_channels: int, number of channels in the output data
-        labels: torch.Tensor, labels for weak supervision (Optional)
+        labels: bool, whether to use labels for weak supervision
         latent_dim: int, dimension of the latent space
         beta: float, beta parameter for KL divergence
         reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
         subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
     """
-    def __init__(self, data_shape, num_channels = 1, labels = None,
+    def __init__(self, data_shape, num_channels = 1, labels = False,
                 latent_dim=10, beta = 1.0, reconstruction_loss = 'bernoulli',subtract_true_image_entropy = False):
         super().__init__(data_shape, num_channels, latent_dim)
         self.beta = beta
@@ -37,7 +37,10 @@ class MLVAEBase(VAE):
     def aggregate(self, z_mean_1, z_logvar_1, z_mean_avg, z_logvar_avg, per_point_kl):
         pass
     
-    def forward(self, x):
+    def forward(self, x, labels = None):
+        if self.labels:
+            assert labels is not None, "Labels are required when using labels"
+            
         features_x1 = x[:, :, :self.data_shape[1], :]
         features_x2 = x[:, :, self.data_shape[1]:, :]
 
@@ -60,11 +63,11 @@ class MLVAEBase(VAE):
         #Aggregate the representations
         z_aggr_1, z_aggr_logvar_1 = self.aggregate(z_mean_1, z_logvar_1,
                                             z_mean_avg, z_logvar_avg,
-                                            per_point_kl)
+                                            per_point_kl, labels)
         
         z_aggr_2, z_aggr_logvar_2 = self.aggregate(z_mean_2, z_logvar_2,
                                             z_mean_avg, z_logvar_avg,
-                                            per_point_kl)
+                                            per_point_kl, labels)
 
         #Sample using distributions
         z_sampled_1 = self.reparameterize(z_aggr_1, z_aggr_logvar_1)
@@ -107,8 +110,8 @@ class MLVAELabels(MLVAEBase):
         subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
     """
 
-    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl):
-        return losses.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, self.labels)
+    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl, labels):
+        return losses.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, labels)
     
 
 class MLVAEArgMax(MLVAEBase):
@@ -125,5 +128,5 @@ class MLVAEArgMax(MLVAEBase):
         subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
     """
 
-    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl):
+    def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl, labels):
         return losses.aggregate_max(z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl)
