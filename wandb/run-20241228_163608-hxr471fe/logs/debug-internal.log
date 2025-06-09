@@ -1,8 +1,0 @@
-{"time":"2024-12-28T16:36:08.489468+04:00","level":"INFO","msg":"using version","core version":"0.19.1"}
-{"time":"2024-12-28T16:36:08.489497+04:00","level":"INFO","msg":"created symlink","path":"/Users/akchunya/Projects/WSD-without-compromise/wandb/run-20241228_163608-hxr471fe/logs/debug-core.log"}
-{"time":"2024-12-28T16:36:08.597611+04:00","level":"INFO","msg":"created new stream","id":"hxr471fe"}
-{"time":"2024-12-28T16:36:08.597651+04:00","level":"INFO","msg":"stream: started","id":"hxr471fe"}
-{"time":"2024-12-28T16:36:08.597657+04:00","level":"INFO","msg":"writer: Do: started","stream_id":"hxr471fe"}
-{"time":"2024-12-28T16:36:08.597678+04:00","level":"INFO","msg":"sender: started","stream_id":"hxr471fe"}
-{"time":"2024-12-28T16:36:08.597669+04:00","level":"INFO","msg":"handler: started","stream_id":"hxr471fe"}
-{"time":"2024-12-28T16:36:09.115614+04:00","level":"INFO","msg":"Starting system monitor"}

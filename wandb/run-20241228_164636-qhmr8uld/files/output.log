@@ -1,8 +1,0 @@
-Epoch: 1/100:   0%|                                                                                                    | 0/100 [00:10<?, ?it/s]
-Traceback (most recent call last):
-  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 193, in <module>
-    train()
-  File "/Users/akchunya/Projects/WSD-without-compromise/tests/cards_latent_dim_text.py", line 93, in train
-    for i, data in tqdm(enumerate(train_dataloader), f"Training Batch: {i+1}/{len(train_dataloader)}"):
-                                                                        ^
-UnboundLocalError: cannot access local variable 'i' where it is not associated with a value

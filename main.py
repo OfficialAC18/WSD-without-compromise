@@ -39,7 +39,7 @@ def main(args):
 
     #Load the dataset object
     dataset = DisentangledDataset(sampler, observed_idx=args.observed_idx,
-                                k_observed=args.k_observed, observed_idx = args.observed_idx)
+                                k_observed=args.k_observed)
     
     #Load the dataloader
     dataloader = DataLoader(dataset,
@@ -130,9 +130,14 @@ def main(args):
                 batch_data = batch_data.to(device)
             elif isinstance(batch_data, (list, tuple)):
                 batch_data = [x.to(device) if isinstance(x, torch.Tensor) else x for x in batch_data]
+                batch_data = batch_data[0]
+                labels = batch_data[1]
 
             # Forward pass
-            x1_recons, x2_recons, loss, neg_elbo = model(batch_data)
+            if model.labels:
+                x1_recons, x2_recons, loss, neg_elbo = model(batch_data, labels)
+            else:
+                x1_recons, x2_recons, loss, neg_elbo = model(batch_data)
             elbo = -neg_elbo
             
             # Backward pass
