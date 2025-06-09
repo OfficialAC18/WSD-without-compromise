@@ -1,6 +1,6 @@
 import torch
 
-from utils import losses
+from utils import losses, aggregate
 from functools import partial
 
 from models.VAE import VAE
@@ -26,7 +26,7 @@ class GroupVAEBase(VAE):
         self.labels = labels
         if reconstruction_loss == 'bernoulli':
             self.reconstruction_loss = partial(losses.bernoulli_loss,
-                                               subtract_true_image_entropy=subtract_true_image_entropy)
+                                                subtract_true_image_entropy=subtract_true_image_entropy)
         elif reconstruction_loss == 'l2':
             self.reconstruction_loss = losses.l2_loss
 
@@ -105,7 +105,7 @@ class GroupVAELabels(GroupVAEBase):
     """
 
     def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl, labels):
-        return losses.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, labels)
+        return aggregate.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, labels)
 
 
 class GroupVAEArgMax(GroupVAEBase):
@@ -123,4 +123,4 @@ class GroupVAEArgMax(GroupVAEBase):
     """
 
     def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl, labels):
-        return losses.aggregate_max(z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl)
+        return aggregate.aggregate_max(z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl)

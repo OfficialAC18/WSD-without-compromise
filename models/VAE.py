@@ -89,6 +89,7 @@ class VAE(GaussianEncoderDecoderModel):
             out_features=latent_dim
         )
 
+        print("Data Shape:", self.data_shape)
         #Pass throught the encoder components to initlalize the lazy linear layer
         self.enc_1_output_shape = self.enc_1(torch.randn(1, *data_shape)).shape
         self.enc_2_output_shape = self.enc_2(self.enc_1(torch.randn(1, *data_shape))).shape

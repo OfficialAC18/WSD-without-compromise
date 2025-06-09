@@ -127,9 +127,12 @@ class PlayingCardsNoTransform(DisentangledSampler):
             suit = self.latent2suit[all_factors[i,1].item()]
             label = f'{rank}{suit}'
             image_path = os.path.join(self.data_dir, self.labels[label])
-            images.append(torchvision.io.read_image(image_path)[1:,:,:])
+            image = torchvision.io.read_image(image_path)[1:,:,:].float()
+            # Normalize by channel mean and std
+            image = (image - image.mean(dim=[1,2], keepdim=True)) / (image.std(dim=[1,2], keepdim=True) + 1e-8)
+            images.append(image)
 
-        images = torch.stack(images) if len(images) > 1 else images[0].unsqueeze(0)
+        images = torch.stack(images) if len(images) > 1 else images[0]
 
         return images if return_latents else images
     
@@ -185,7 +188,7 @@ class PlayingCardsNoTransform(DisentangledSampler):
         images_x1 = self.sample_observations(num, all_factors_x1, return_latents=False)
         images_x2 = self.sample_observations(num, all_factors_x2, return_latents=False)
 
-        all_images = torch.cat((images_x1,images_x2), dim=2)
+        all_images = torch.cat((images_x1,images_x2), dim=1)
 
         return all_images, label, (all_factors_x1, all_factors_x2) if return_latents else all_images, label
 

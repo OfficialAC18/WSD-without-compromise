@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 
 def bernoulli_loss(x_true,x_recons,
-                   subract_true_image_entropy=False):
+                   subtract_true_image_entropy=False):
     
     """
     Computes the Bernoulli Loss between the true image and the reconstructed image
@@ -19,14 +19,14 @@ def bernoulli_loss(x_true,x_recons,
     x_true_reshaped = torch.reshape(x_true, (x_true.shape[0], -1))
     x_recons_reshaped = torch.reshape(x_recons, (x_recons.shape[0], -1))  
 
-    if subract_true_image_entropy:
+    if subtract_true_image_entropy:
         dist = torch.distributions.bernoulli.Bernoulli(probs=torch.clamp(x_true_reshaped, 1e-6, 1 - 1e-6))
-        loss_lower_bound = torch.sum(dist.entropy(),dim=0)
+        loss_lower_bound = torch.sum(dist.entropy(),dim=1)
     else:
         loss_lower_bound = 0
     
     #Calculate sigmoid cross entropy
-    loss = torch.sum(F.binary_cross_entropy_with_logits(x_recons_reshaped, x_true_reshaped,
+    loss = torch.sum(F.binary_cross_entropy_with_logits(input=F.sigmoid(x_recons_reshaped), target=x_true_reshaped,
                                             reduction='none'), dim = 1)
     
     return loss - loss_lower_bound
