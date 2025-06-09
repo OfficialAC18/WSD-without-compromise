@@ -23,7 +23,7 @@ parser.add_argument('--k_observed', type=int, default=1, help='Number of observe
 parser.add_argument('--observed_idx', type=str, default='constant', help='Index of the observed factors')
 parser.add_argument('--aggregate', type=str, default='argmax', help='Aggregation method for the VAE')
 parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer')
-parser.add_argument('--batch_size', type=int, default=64, help='Batch size for training')
+parser.add_argument('--batch_size', type=int, default=52, help='Batch size for training')
 parser.add_argument('--num_train_steps', type=int, default=100000, help='Number of training steps')
 
 
@@ -39,12 +39,11 @@ def main(args):
 
     #Load the dataset object
     dataset = DisentangledDataset(sampler, observed_idx=args.observed_idx,
-                                k_observed=args.k_observed,
-                                return_latents=True if args.aggregate == 'argmax' else False)
+                                k_observed=args.k_observed)
     
     #Load the dataloader
     dataloader = DataLoader(dataset,
-                            batch_size=52,
+                            batch_size=args.batch_size,
                             shuffle=True,
                             num_workers=1)
     
@@ -94,7 +93,7 @@ def main(args):
             "observed_idx": args.observed_idx,
             "k_observed": args.k_observed,
             "learning_rate": args.learning_rate if hasattr(args, 'learning_rate') else 1e-3,
-            "batch_size": 52,
+            "batch_size": args.batch_size,
             "training_steps": args.training_steps if hasattr(args, 'training_steps') else 10000
         }
     )
