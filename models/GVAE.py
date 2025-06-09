@@ -3,7 +3,7 @@ import torch
 from utils import losses
 from functools import partial
 
-from VAE import VAE
+from models.VAE import VAE
 
 
 class GroupVAEBase(VAE):
