@@ -105,13 +105,13 @@ class PlayingCardsNoTransform(DisentangledSampler):
     
     def sample_observations(self, num,
                             observed_factors = None, 
-                            return_factors=True):
+                            return_latents=True):
         """
         Attain a set of observations from the dataset
         Args:
             num: int, number of examples to generate
             (Optional) observed_factors: torch.Tensor, the latent factors that we observe
-            return_factors: bool, whether to return the latent factors as well
+            return_latents: bool, whether to return the latent factors as well
         
         Returns:
             (X,Y): torch.Tensor, The set of examples and their corresponding latent factors
@@ -131,10 +131,10 @@ class PlayingCardsNoTransform(DisentangledSampler):
 
         images = torch.stack(images) if len(images) > 1 else images[0].unsqueeze(0)
 
-        return images if return_factors else images
+        return images if return_latents else images
     
 
-    def sample_paired_observations_from_factors(self, num=1, k = -1, observed_idx='constant', return_factors=False):
+    def sample_paired_observations_from_factors(self, num=1, k = -1, observed_idx='constant', return_latents=False):
         """
         Generate the required paired examples for Weak Disentanglement
         Args:
@@ -182,10 +182,10 @@ class PlayingCardsNoTransform(DisentangledSampler):
         all_factors_x2[:,indices] = replacement_latents
 
         #Now we get the images for the pairs
-        images_x1 = self.sample_observations(num, all_factors_x1, return_factors=False)
-        images_x2 = self.sample_observations(num, all_factors_x2, return_factors=False)
+        images_x1 = self.sample_observations(num, all_factors_x1, return_latents=False)
+        images_x2 = self.sample_observations(num, all_factors_x2, return_latents=False)
 
         all_images = torch.cat((images_x1,images_x2), dim=2)
 
-        return all_images, label, (all_factors_x1, all_factors_x2) if return_factors else all_images, label
+        return all_images, label, (all_factors_x1, all_factors_x2) if return_latents else all_images, label
 
