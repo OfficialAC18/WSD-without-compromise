@@ -20,7 +20,7 @@ parser.add_argument('--eval_seed', type=int, default=42, help='Seed for running 
 parser.add_argument('--overwrite', action='store_true', help='Overwrite existing model checkpoints')
 parser.add_argument('--model', type=str, default='G_VAE', help='Model to use (ML_VAE, G_VAE)')
 parser.add_argument('--k_observed', type=int, default=1, help='Number of observed factors')
-parser.add_argument('--observed_idx', type=str, default='constant', help='Index of the observed factors')
+parser.add_argument('--observed_idx', type=str, default='random', help='Index of the observed factors')
 parser.add_argument('--aggregate', type=str, default='argmax', help='Aggregation method for the VAE')
 parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer')
 parser.add_argument('--batch_size', type=int, default=52, help='Batch size for training')
@@ -39,7 +39,7 @@ def main(args):
 
     #Load the dataset object
     dataset = DisentangledDataset(sampler, observed_idx=args.observed_idx,
-                                k_observed=args.k_observed)
+                                k_observed=args.k_observed, observed_idx = args.observed_idx)
     
     #Load the dataloader
     dataloader = DataLoader(dataset,
@@ -121,7 +121,7 @@ def main(args):
     pbar = tqdm(total=num_training_steps, desc="Training", unit="step")
     
     while step < num_training_steps:
-        for batch_idx, batch_data in enumerate(dataloader):
+        for batch_data in dataloader:
             if step >= num_training_steps:
                 break
             
