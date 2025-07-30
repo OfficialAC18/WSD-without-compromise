@@ -8,7 +8,7 @@ class DisentangledSampler(ABC):
         raise NotImplementedError()
     
     @abstractmethod
-    def latent_factor_sizes(self):
+    def observed_latent_factor_sizes(self):
         raise NotImplementedError()
     
     @abstractmethod
@@ -16,7 +16,7 @@ class DisentangledSampler(ABC):
         raise NotImplementedError()
     
     @abstractmethod
-    def sample_latent_factors(self, random_state, num_samples):
+    def sample_latent_factors(self, num_samples):
         raise NotImplementedError()
     
     @abstractmethod
@@ -40,7 +40,13 @@ class DisentangledDataset(Dataset):
         return self.sampler.num_examples
 
     def __getitem__(self, idx):
-        return self.sampler.sample_paired_observations_from_factors(num = 1,
-                                                             k = self.k_observed,
-                                                             observed_idx = self.observed_idx,
-                                                             return_latents = self.return_latents)
+        return self.sampler.sample_paired_observations(num_samples = 1,
+                                                       k = self.k_observed,
+                                                       observed_idx = self.observed_idx,
+                                                       return_latents = self.return_latents)
+
+    def __getitems__(self, idx):
+        return self.sampler.sample_paired_observations(num_samples = len(idx),
+                                                       k = self.k_observed,
+                                                       observed_idx = self.observed_idx,
+                                                       return_latents = self.return_latents)
