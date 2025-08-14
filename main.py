@@ -45,7 +45,7 @@ def main(args):
     dataloader = DataLoader(dataset,
                             batch_size=args.batch_size,
                             shuffle=True,
-                            num_workers=1)
+                            collate_fn=lambda x: x)
     
     
     #Load the model
@@ -68,7 +68,8 @@ def main(args):
             model = GroupVAEArgMax(data_shape=dataset.sampler.data_shape,
                                    latent_dim=args.latent_dim,
                                    num_channels=dataset.sampler.data_shape[0],
-                                   labels=False)
+                                   labels=False,
+                                   subtract_true_image_entropy=True)
         else:
             from models.GVAE import GroupVAELabels
             model = GroupVAELabels(data_shape=dataset.sampler.data_shape,
@@ -83,20 +84,20 @@ def main(args):
                                  betas = (0.9, 0.999), eps=1e-8)
     
     # Initialize wandb for experiment tracking
-    wandb.init(
-        project="disentangled-representations",
-        config={
-            "model": args.model,
-            "dataset": args.dataset,
-            "latent_dim": args.latent_dim,
-            "aggregate": args.aggregate,
-            "observed_idx": args.observed_idx,
-            "k_observed": args.k_observed,
-            "learning_rate": args.learning_rate if hasattr(args, 'learning_rate') else 1e-3,
-            "batch_size": args.batch_size,
-            "training_steps": args.training_steps if hasattr(args, 'training_steps') else 10000
-        }
-    )
+    # wandb.init(
+    #     project="disentangled-representations",
+    #     config={
+    #         "model": args.model,
+    #         "dataset": args.dataset,
+    #         "latent_dim": args.latent_dim,
+    #         "aggregate": args.aggregate,
+    #         "observed_idx": args.observed_idx,
+    #         "k_observed": args.k_observed,
+    #         "learning_rate": args.learning_rate if hasattr(args, 'learning_rate') else 1e-3,
+    #         "batch_size": args.batch_size,
+    #         "training_steps": args.training_steps if hasattr(args, 'training_steps') else 10000
+    #     }
+    # )
     
     # Set device with priority: CUDA > MPS (Apple Silicon) > CPU
     import platform
@@ -154,13 +155,13 @@ def main(args):
             pbar.update(1)
             
             # Log batch metrics to wandb
-            if step % 100 == 0:
-                wandb.log({
-                    "loss": loss.item(),
-                    "elbo": elbo.item(),
-                    "step": step,
-                    "epoch": epoch
-                })
+            # if step % 100 == 0:
+            #     wandb.log({
+            #         "loss": loss.item(),
+            #         "elbo": elbo.item(),
+            #         "step": step,
+            #         "epoch": epoch
+            #     })
             
             # Print detailed progress less frequently
             if step % 1000 == 0:
@@ -179,8 +180,8 @@ def main(args):
     logging.info(f'Model saved to {model_path}')
     
     # Save model to wandb
-    wandb.save(model_path)
-    wandb.finish()
+    # wandb.save(model_path)
+    # wandb.finish()
 
 
 if __name__ == '__main__':
