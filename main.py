@@ -3,28 +3,32 @@ import wandb
 import torch
 import logging
 import argparse
+import random
 from tqdm import tqdm
 from utils.utils import get_dataset
 from data.disentangled import DisentangledDataset
 from torch.utils.data import DataLoader
+from visualize.visualize_model import visualize_model
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--model_dir', type=str, required=True, help='Directory to model checkpoints \
                                                             (models are trained if directory is empty)')
-parser.add_argument('--model_name', type=str, help='Name of the model', default='trained_model.pth')
+parser.add_argument('--model_name', type=str, help='Name of the model', default='trained_model')
 parser.add_argument('--latent_dim', type=int, default=10, help='Dimension of the latent space')
 parser.add_argument('--dataset', type=str, default='dSprites', help='Name of the dataset to use')
 parser.add_argument('--pipeline_seed', type=int, default=42, help='Seed for the pipeline')
 parser.add_argument('--eval_seed', type=int, default=42, help='Seed for running evaluation')
 parser.add_argument('--overwrite', action='store_true', help='Overwrite existing model checkpoints')
-parser.add_argument('--model', type=str, default='G_VAE', help='Model to use (ML_VAE, G_VAE)')
+parser.add_argument('--model', type=str, default='G_VAE', help='Model to use (VAE, ML_VAE, G_VAE)')
 parser.add_argument('--k_observed', type=int, default=1, help='Number of observed factors')
 parser.add_argument('--observed_idx', type=str, default='random', help='Index of the observed factors')
 parser.add_argument('--aggregate', type=str, default='argmax', help='Aggregation method for the VAE')
 parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer')
 parser.add_argument('--batch_size', type=int, default=52, help='Batch size for training')
 parser.add_argument('--num_train_steps', type=int, default=100000, help='Number of training steps')
+parser.add_argument('--beta', type=float, default=1, help='Weighting of KL loss')
+parser.add_argument('--recon_loss', type=str, default='bernoulli', help='Which reconstruction loss to use')
 
 
 def main(args):
@@ -40,12 +44,11 @@ def main(args):
     #Load the dataset object
     dataset = DisentangledDataset(sampler, observed_idx=args.observed_idx,
                                 k_observed=args.k_observed)
-    
+
     #Load the dataloader
     dataloader = DataLoader(dataset,
                             batch_size=args.batch_size,
-                            shuffle=True,
-                            num_workers=1)
+                            shuffle=True, collate_fn=lambda data: data)
     
     
     #Load the model
@@ -53,29 +56,32 @@ def main(args):
         if args.aggregate == 'argmax':
             from models.ML_VAE import MLVAEArgMax
             model = MLVAEArgMax(data_shape=dataset.sampler.data_shape,
-                                latent_dim=args.latent_dim,
+                                latent_dim=args.latent_dim, beta = args.beta, reconstruction_loss=args.recon_loss,
                                 num_channels=dataset.sampler.data_shape[0],
                                 labels=False)
         else:
             from models.ML_VAE import MLVAELabels
             model = MLVAELabels(data_shape=dataset.sampler.data_shape,
-                                latent_dim=args.latent_dim,
+                                latent_dim=args.latent_dim, beta = args.beta, reconstruction_loss=args.recon_loss,
                                 num_channels=dataset.sampler.data_shape[0],
                                 labels=True)
     elif args.model == 'G_VAE':
         if args.aggregate == 'argmax':
             from models.GVAE import GroupVAEArgMax
             model = GroupVAEArgMax(data_shape=dataset.sampler.data_shape,
-                                   latent_dim=args.latent_dim,
+                                   latent_dim=args.latent_dim, beta = args.beta, reconstruction_loss=args.recon_loss,
                                    num_channels=dataset.sampler.data_shape[0],
                                    labels=False)
         else:
             from models.GVAE import GroupVAELabels
             model = GroupVAELabels(data_shape=dataset.sampler.data_shape,
-                                   latent_dim=args.latent_dim,
+                                   latent_dim=args.latent_dim, beta = args.beta, reconstruction_loss=args.recon_loss,
                                    num_channels=dataset.sampler.data_shape[0],
                                    labels=True)
-
+    elif args.model == 'VAE':
+        from models.VAE import VAE
+        model = VAE(data_shape=dataset.sampler.data_shape, latent_dim=args.latent_dim,
+                    reconstruction_loss=args.recon_loss,)
 
 
     # Setup optimizer
@@ -83,20 +89,20 @@ def main(args):
                                  betas = (0.9, 0.999), eps=1e-8)
     
     # Initialize wandb for experiment tracking
-    wandb.init(
-        project="disentangled-representations",
-        config={
-            "model": args.model,
-            "dataset": args.dataset,
-            "latent_dim": args.latent_dim,
-            "aggregate": args.aggregate,
-            "observed_idx": args.observed_idx,
-            "k_observed": args.k_observed,
-            "learning_rate": args.learning_rate if hasattr(args, 'learning_rate') else 1e-3,
-            "batch_size": args.batch_size,
-            "training_steps": args.training_steps if hasattr(args, 'training_steps') else 10000
-        }
-    )
+    # wandb.init(
+    #     project="disentangled-representations",
+    #     config={
+    #         "model": args.model,
+    #         "dataset": args.dataset,
+    #         "latent_dim": args.latent_dim,
+    #         "aggregate": args.aggregate,
+    #         "observed_idx": args.observed_idx,
+    #         "k_observed": args.k_observed,
+    #         "learning_rate": args.learning_rate if hasattr(args, 'learning_rate') else 1e-3,
+    #         "batch_size": args.batch_size,
+    #         "training_steps": args.training_steps if hasattr(args, 'training_steps') else 10000
+    #     }
+    # )
     
     # Set device with priority: CUDA > MPS (Apple Silicon) > CPU
     import platform
@@ -111,7 +117,7 @@ def main(args):
     logging.info(f'Using device: {device}')
     
     # Training loop based on number of steps
-    num_training_steps = args.training_steps if hasattr(args, 'training_steps') else 10000
+    num_training_steps = args.num_train_steps
     model.train()
     
     step = 0
@@ -130,15 +136,14 @@ def main(args):
                 batch_data = batch_data.to(device)
             elif isinstance(batch_data, (list, tuple)):
                 batch_data = [x.to(device) if isinstance(x, torch.Tensor) else x for x in batch_data]
-                batch_data = batch_data[0]
                 labels = batch_data[1]
+                batch_data = batch_data[0]
 
             # Forward pass
             if model.labels:
-                x1_recons, x2_recons, loss, neg_elbo = model(batch_data, labels)
+                x1_recons, x2_recons, loss, elbo = model(batch_data, labels)
             else:
-                x1_recons, x2_recons, loss, neg_elbo = model(batch_data)
-            elbo = -neg_elbo
+                x1_recons, x2_recons, loss, elbo = model(batch_data)
             
             # Backward pass
             optimizer.zero_grad()
@@ -154,13 +159,13 @@ def main(args):
             pbar.update(1)
             
             # Log batch metrics to wandb
-            if step % 100 == 0:
-                wandb.log({
-                    "loss": loss.item(),
-                    "elbo": elbo.item(),
-                    "step": step,
-                    "epoch": epoch
-                })
+            # if step % 100 == 0:
+            #     wandb.log({
+            #         "loss": loss.item(),
+            #         "elbo": elbo.item(),
+            #         "step": step,
+            #         "epoch": epoch
+            #     })
             
             # Print detailed progress less frequently
             if step % 1000 == 0:
@@ -174,18 +179,40 @@ def main(args):
     pbar.close()
     
     # Save the trained model
-    model_path = os.path.join(args.model_dir, args.model_name)
+    model_path = os.path.join(args.model_dir, f'{args.model_name}_{args.pipeline_seed}.pth')
     torch.save(model.state_dict(), model_path)
-    logging.info(f'Model saved to {model_path}')
+    print(f'Model saved to {model_path}')
     
     # Save model to wandb
-    wandb.save(model_path)
-    wandb.finish()
+    # wandb.save(model_path)
+    # wandb.finish()
 
 
 if __name__ == '__main__':
     args = parser.parse_args()
+    seed = random.randint(0, 99999)
+    random.seed(seed)
+    args.pipeline_seed = seed
+    args.eval_seed = seed
+    # args.aggregate = random.choice(['argmax', 'label'])
+    args.aggregate = 'argmax'
+    if args.aggregate == 'argmax':
+        # args.latent_dim = random.choice([6, 10, 20])
+        args.latent_dim = random.choice([6, 20, 100, 1000, 4096])
+    else:
+        args.latent_dim = 6
+    # args.model = random.choice(['G_VAE', 'ML_VAE'])
+    args.model = 'VAE'
+    args.k_observed = random.choice([1, 2, 3, 4, 5, 6])
+    args.learning_rate = random.choice([1e-2, 1e-3, 1e-4, 1e-5, 1e-6])
+    args.batch_size = random.choice([16, 32, 64, 128])
+    # args.beta = random.choice([0.1, 0.2, 0.5, 1, 2])
+    args.beta = random.choice([0.5, 1, 2, 4, 8])
+    args.num_train_steps = 2000000//args.batch_size
+    args.recon_loss = random.choice(['bernoulli', 'l2'])
+    print(args)
     main(args)
+    visualize_model(seed, args.model, args.aggregate, args.latent_dim)
 
 
 

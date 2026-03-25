@@ -1,9 +1,9 @@
 import torch
 
-from utils import losses
+from utils import losses, aggregate
 from functools import partial
 
-from VAE import VAE
+from models.VAE import VAE
 
 
 
@@ -93,7 +93,7 @@ class MLVAEBase(VAE):
         loss = reconstruction_loss + regularizer
         elbo = reconstruction_loss + kl_loss
 
-        return x_recons_1, x_recons_2, loss, -elbo
+        return x_recons_1, x_recons_2, loss, elbo
 
 
 class MLVAELabels(MLVAEBase):
@@ -111,7 +111,7 @@ class MLVAELabels(MLVAEBase):
     """
 
     def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl, labels):
-        return losses.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, labels)
+        return aggregate.aggregate_labels(z_mean, z_logvar, z_mean_avg, z_logvar_avg, labels)
     
 
 class MLVAEArgMax(MLVAEBase):
@@ -129,4 +129,4 @@ class MLVAEArgMax(MLVAEBase):
     """
 
     def aggregate(self, z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl, labels):
-        return losses.aggregate_max(z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl)
+        return aggregate.aggregate_max(z_mean, z_logvar, z_mean_avg, z_logvar_avg, per_point_kl)

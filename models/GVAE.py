@@ -52,7 +52,7 @@ class GroupVAEBase(VAE):
 
         #Calculate the average representation
         z_mean_avg = 0.5*(z_mean_1 + z_mean_2)
-        z_logvar_avg = 0.5*(torch.exp(z_logvar_1) + torch.exp(z_logvar_2))
+        z_logvar_avg = torch.log(0.5*(torch.exp(z_logvar_1) + torch.exp(z_logvar_2)))
 
         #Aggregate the representations
         z_agg_1, z_agg_logvar_1 = self.aggregate(z_mean_1, z_logvar_1,
@@ -87,7 +87,7 @@ class GroupVAEBase(VAE):
         loss = reconstruction_loss + regularizer
         elbo = reconstruction_loss + kl_loss
 
-        return x_recons_1, x_recons_2, loss, -elbo
+        return x_recons_1, x_recons_2, loss, elbo
     
 
 class GroupVAELabels(GroupVAEBase):

@@ -1,7 +1,8 @@
 import torch
 import torch.nn.functional as F
 from abc import ABC, abstractmethod
-
+from functools import partial
+from utils import losses
 
 
 class GaussianEncoderDecoderModel(torch.nn.Module, ABC):
@@ -50,11 +51,19 @@ class VAE(GaussianEncoderDecoderModel):
     Uses a Convolutional Model as the encoder-decoder structures.
     """
     
-    def __init__(self, data_shape, num_channels = 1, latent_dim=10):
+    def __init__(self, data_shape, num_channels = 1, latent_dim=10, reconstruction_loss = 'bernoulli', beta=1):
         super().__init__()
         self.z_mean = None
         self.z_logvar = None
+        self.labels = None
         self.data_shape = data_shape
+        self.beta = beta
+
+        if reconstruction_loss == 'bernoulli':
+            self.reconstruction_loss = partial(losses.bernoulli_loss,
+                                                subtract_true_image_entropy=False)
+        elif reconstruction_loss == 'l2':
+            self.reconstruction_loss = losses.l2_loss
 
         #Defining the encoder components
         self.enc_1 = torch.nn.Conv2d(in_channels=num_channels,
@@ -127,10 +136,27 @@ class VAE(GaussianEncoderDecoderModel):
                                             stride=2)
     
     def forward(self, x):
-        z_mean, z_logvar = self.encoder(x)
-        z = self.reparameterize(z_mean, z_logvar)
-        x_recons = self.decoder(z)
-        return x_recons, z_mean, z_logvar
+        features_x1 = x[:, :, :self.data_shape[1], :]
+        features_x2 = x[:, :, self.data_shape[1]:, :]
+        z_mean_1, z_logvar_1 = self.encoder(features_x1)
+        z_mean_2, z_logvar_2 = self.encoder(features_x2)
+        z_sampled_1 = self.reparameterize(z_mean_1, z_logvar_1)
+        z_sampled_2 = self.reparameterize(z_mean_2, z_logvar_2)
+        x_recons_1 = self.decoder(z_sampled_1)
+        x_recons_2 = self.decoder(z_sampled_2)
+        recon_loss_1 = torch.mean(self.reconstruction_loss(features_x1, x_recons_1))
+        recon_loss_2 = torch.mean(self.reconstruction_loss(features_x2, x_recons_2))
+        recon_loss = 0.5 * (recon_loss_1 + recon_loss_2)
+        kl_loss_1 = losses.compute_gaussian_kl(z_mean_1, z_logvar_1)
+        kl_loss_2 = losses.compute_gaussian_kl(z_mean_2, z_logvar_2)
+        kl_loss = 0.5 * (kl_loss_1 + kl_loss_2)
+        regularizer = self.regularizer(kl_loss)
+        loss = recon_loss + regularizer
+        elbo = recon_loss + kl_loss
+        # z_mean, z_logvar = self.encoder(x)
+        # z = self.reparameterize(z_mean, z_logvar)
+        # x_recons = self.decoder(z)
+        return x_recons_1, x_recons_2, loss, elbo
 
 
     def encoder(self, x):
@@ -166,6 +192,9 @@ class VAE(GaussianEncoderDecoderModel):
         std = torch.exp(0.5 * log_var)
         eps = torch.randn_like(std)
         return mu + eps * std
+
+    def regularizer(self, kl_loss):
+        return self.beta * kl_loss
 
 
 

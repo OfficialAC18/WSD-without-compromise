@@ -26,7 +26,7 @@ def bernoulli_loss(x_true,x_recons,
         loss_lower_bound = 0
     
     #Calculate sigmoid cross entropy
-    loss = torch.sum(F.binary_cross_entropy_with_logits(input=F.sigmoid(x_recons_reshaped), target=x_true_reshaped,
+    loss = torch.mean(F.binary_cross_entropy_with_logits(input=x_recons_reshaped, target=x_true_reshaped,
                                             reduction='none'), dim = 1)
     
     return loss - loss_lower_bound
@@ -41,7 +41,10 @@ def l2_loss(x_true,x_recons):
     Returns:
         loss: torch.Tensor, L2 loss
     """
-    return torch.sum((x_true - torch.nn.Sigmoid()(x_recons))**2,dim=1)
+    x_true_reshaped = torch.reshape(x_true, (x_true.shape[0], -1))
+    x_recons_reshaped = torch.reshape(torch.nn.Sigmoid()(x_recons), (x_recons.shape[0], -1))
+    loss = torch.mean(F.mse_loss(input=x_recons_reshaped, target=x_true_reshaped, reduction='none'), dim=1)
+    return loss
 
 
 def compute_gaussian_kl(z_mean, z_logvar):
