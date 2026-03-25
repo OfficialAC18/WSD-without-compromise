@@ -26,7 +26,7 @@ def bernoulli_loss(x_true,x_recons,
         loss_lower_bound = 0
     
     #Calculate sigmoid cross entropy
-    loss = torch.mean(F.binary_cross_entropy_with_logits(input=x_recons_reshaped, target=x_true_reshaped,
+    loss = torch.sum(F.binary_cross_entropy_with_logits(input=F.sigmoid(x_recons_reshaped), target=x_true_reshaped,
                                             reduction='none'), dim = 1)
     
     return loss - loss_lower_bound

@@ -70,16 +70,20 @@ class GroupVAEBase(VAE):
         #Reconstruct the images
         x_recons_1 = self.decoder(z_sampled_1)
         x_recons_2 = self.decoder(z_sampled_2)
+        x_recons_1_max = torch.amax(x_recons_1, dim=(2,3))
+        x_recons_2_max = torch.amax(x_recons_2, dim=(2,3))
 
         #Calculate the reconstruction loss
         reconstruction_loss_1 = torch.mean(self.reconstruction_loss(features_x1, x_recons_1))
         reconstruction_loss_2 = torch.mean(self.reconstruction_loss(features_x2, x_recons_2))
-        reconstruction_loss = 0.5*(reconstruction_loss_1 + reconstruction_loss_2)
+        
+        #Doing it this way for numerical stability
+        reconstruction_loss = 0.5*reconstruction_loss_1 + 0.5*reconstruction_loss_2
 
         #Calculate the KL divergence
         kl_loss_1 = losses.compute_gaussian_kl(z_agg_1, z_agg_logvar_1)
         kl_loss_2 = losses.compute_gaussian_kl(z_agg_2, z_agg_logvar_2)
-        kl_loss = 0.5*(kl_loss_1 + kl_loss_2)
+        kl_loss = 0.5*kl_loss_1 + 0.5*kl_loss_2
 
         #Regularizing KL Loss
         regularizer = self.regularizer(kl_loss)
