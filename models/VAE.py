@@ -1,5 +1,5 @@
 import torch
-import torch.nn.functional as F
+import torch.nn as nn
 from abc import ABC, abstractmethod
 from functools import partial
 from utils import losses
@@ -53,140 +53,82 @@ class VAE(GaussianEncoderDecoderModel):
     
     def __init__(self, data_shape, num_channels = 1, latent_dim=10, reconstruction_loss = 'bernoulli', beta=1):
         super().__init__()
-        self.z_mean = None
-        self.z_logvar = None
-        self.labels = None
         self.data_shape = data_shape
         self.beta = beta
+        self.latent_dim = latent_dim
+        self.labels = False
 
         if reconstruction_loss == 'bernoulli':
-            self.reconstruction_loss = partial(losses.bernoulli_loss,
-                                                subtract_true_image_entropy=False)
+            self.reconstruction_loss = losses.bernoulli_loss
         elif reconstruction_loss == 'l2':
             self.reconstruction_loss = losses.l2_loss
 
-        #Defining the encoder components
-        self.enc_1 = torch.nn.Conv2d(in_channels=num_channels,
-                                     out_channels=32,
-                                     kernel_size=4,
-                                     stride=2)
-        
-        self.enc_2 = torch.nn.Conv2d(in_channels=32,
-                                     out_channels=32,
-                                     kernel_size=4,
-                                     stride=2)
-        
-        self.enc_3 = torch.nn.Conv2d(in_channels=32,
-                                     out_channels=64,
-                                     kernel_size=4,
-                                     stride=2)
-        
-        self.enc_4 = torch.nn.Conv2d(in_channels=64,
-                                     out_channels=64,
-                                     kernel_size=4,
-                                     stride=2)
-        
-        self.enc_5 = torch.nn.LazyLinear(out_features=256)
-
-        self.z_mean_head = torch.nn.Linear(
-            in_features=256,
-            out_features=latent_dim
-        )     
-
-        self.z_logvar_head = torch.nn.Linear(
-            in_features=256,
-            out_features=latent_dim
+        self.enc_conv = nn.Sequential(
+            nn.Conv2d(num_channels, 32, 4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 32, 4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, 4, stride=2, padding=1),
+            nn.ReLU()
         )
 
-        print("Data Shape:", self.data_shape)
-        #Pass throught the encoder components to initlalize the lazy linear layer
-        self.enc_1_output_shape = self.enc_1(torch.randn(1, *data_shape)).shape
-        self.enc_2_output_shape = self.enc_2(self.enc_1(torch.randn(1, *data_shape))).shape
-        self.enc_3_output_shape = self.enc_3(self.enc_2(self.enc_1(torch.randn(1, *data_shape)))).shape
-        self.enc_4_output_shape = self.enc_4(self.enc_3(self.enc_2(self.enc_1(torch.randn(1, *data_shape))))).shape
-        self.enc_5(torch.flatten(self.enc_4(self.enc_3(self.enc_2(self.enc_1(torch.randn(1, *data_shape)))))).reshape(1,-1))
-        
+        # Get shape after convolutions for the decoder
+        with torch.no_grad():
+            dummy = torch.zeros(1, *data_shape)
+            self.feat_shape = self.enc_conv(dummy).shape[1:]
+            self.flat_size = torch.prod(torch.tensor(self.feat_shape)).item()
 
-        #Defining the decoder components
-        self.dec_1 = torch.nn.Linear(in_features=latent_dim,
-                                     out_features=256)
-        
-        self.dec_2 = torch.nn.Linear(in_features=256,
-                                     out_features=self.enc_5.weight.shape[1])
-        
-        self.dec_3 = torch.nn.ConvTranspose2d(in_channels=64,
-                                              out_channels=64,
-                                              kernel_size=4,
-                                              stride=2,
-                                              )
-        
-        self.dec_4 = torch.nn.ConvTranspose2d(in_channels=64,
-                                              out_channels=32,
-                                              kernel_size=4,
-                                              stride=2)
-        
-        self.dec_5 = torch.nn.ConvTranspose2d(in_channels=32,
-                                            out_channels=32,
-                                            kernel_size=4,
-                                            stride=2)
-        
-        self.dec_6 = torch.nn.ConvTranspose2d(in_channels=32,
-                                            out_channels=num_channels,
-                                            kernel_size=4,
-                                            stride=2)
+        self.enc_fc = nn.Sequential(
+            nn.Linear(self.flat_size, 256),
+            nn.ReLU()
+        )
+
+        self.z_mean_head = nn.Linear(256, latent_dim)
+        self.z_logvar_head= nn.Linear(256, latent_dim)
+
+        self.dec_fc = nn.Sequential(
+            nn.Linear(latent_dim, 256),
+            nn.ReLU(),
+            nn.Linear(256, self.flat_size),
+            nn.ReLU()
+        )
+
+        self.dec_conv = nn.Sequential(
+            nn.ConvTranspose2d(64, 64, 4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, 4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 32, 4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, num_channels, 4, stride=2, padding=1)
+        )
     
-    def forward(self, x):
-        features_x1 = x[:, :, :self.data_shape[1], :]
-        features_x2 = x[:, :, self.data_shape[1]:, :]
-        z_mean_1, z_logvar_1 = self.encoder(features_x1)
-        z_mean_2, z_logvar_2 = self.encoder(features_x2)
-        z_sampled_1 = self.reparameterize(z_mean_1, z_logvar_1)
-        z_sampled_2 = self.reparameterize(z_mean_2, z_logvar_2)
-        x_recons_1 = self.decoder(z_sampled_1)
-        x_recons_2 = self.decoder(z_sampled_2)
-        recon_loss_1 = torch.mean(self.reconstruction_loss(features_x1, x_recons_1))
-        recon_loss_2 = torch.mean(self.reconstruction_loss(features_x2, x_recons_2))
-        recon_loss = 0.5 * (recon_loss_1 + recon_loss_2)
-        kl_loss_1 = losses.compute_gaussian_kl(z_mean_1, z_logvar_1)
-        kl_loss_2 = losses.compute_gaussian_kl(z_mean_2, z_logvar_2)
-        kl_loss = 0.5 * (kl_loss_1 + kl_loss_2)
+    def forward(self, x, labels = None):
+        # We only need the first feature for the VAE
+        features = x[:, :, :self.data_shape[1], :]
+        z_mean, z_logvar = self.encoder(features)
+        z_sampled = self.reparameterize(z_mean, z_logvar)
+        x_recons = self.decoder(z_sampled)
+        recon_loss = self.reconstruction_loss(features, x_recons)
+        kl_loss = losses.compute_gaussian_kl(z_mean, z_logvar)
         regularizer = self.regularizer(kl_loss)
         loss = recon_loss + regularizer
         elbo = recon_loss + kl_loss
-        # z_mean, z_logvar = self.encoder(x)
-        # z = self.reparameterize(z_mean, z_logvar)
-        # x_recons = self.decoder(z)
-        return x_recons_1, x_recons_2, loss, elbo
+        return x_recons, x_recons, loss, elbo
 
 
     def encoder(self, x):
-        x = F.relu(self.enc_1(x))
-        x = F.relu(self.enc_2(x))
-        x = F.relu(self.enc_3(x))
-        x = F.relu(self.enc_4(x))
-
-        x = torch.flatten(x, start_dim=1)
-        x = F.relu(self.enc_5(x))
-
-        #Get Mean and Log Variance
-        z_mean = self.z_mean_head(x)
-        z_logvar = self.z_logvar_head(x)
-
-        self.z_mean = z_mean
-        self.z_logvar = z_logvar
-
-        return z_mean, z_logvar
+        h = self.enc_conv(x)
+        h = torch.flatten(h, start_dim=1)
+        h = self.enc_fc(h)
+        return self.z_mean_head(h), self.z_logvar_head(h)
 
     def decoder(self, z):
-        z = self.dec_1(z)
-        z = self.dec_2(z)
-        z = self.dec_3(torch.reshape(z, (-1, *self.enc_4_output_shape[1:])),
-                       output_size=self.enc_3_output_shape)
-        z = self.dec_4(z,output_size=self.enc_2_output_shape)
-        z = self.dec_5(z,output_size=self.enc_1_output_shape)
-        output = self.dec_6(z,output_size=(-1,*self.data_shape))
-        # output = torch.reshape(output, (-1, *self.data_shape))
-        return output
+        h = self.dec_fc(z)
+        h = h.view(-1, *self.feat_shape)
+        return self.dec_conv(h)
 
     def reparameterize(self, mu, log_var):
         std = torch.exp(0.5 * log_var)

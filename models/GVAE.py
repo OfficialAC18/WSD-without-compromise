@@ -19,16 +19,10 @@ class GroupVAEBase(VAE):
         reconstruction_loss: str, type of reconstruction loss (bernoulli or l2)
         subtract_true_image_entropy: bool, whether to subtract the entropy of the true image (in case of bernoulli loss)
     """
-    def __init__(self, data_shape, num_channels = 1, labels = False,
-                latent_dim=10, beta = 1.0, reconstruction_loss = 'bernoulli',subtract_true_image_entropy = False):
-        super().__init__(data_shape, num_channels, latent_dim)
-        self.beta = beta
+    def __init__(self, data_shape, num_channels = 1, labels = False, latent_dim=10, beta = 1.0,
+                 reconstruction_loss = 'bernoulli'):
+        super().__init__(data_shape, num_channels, latent_dim, reconstruction_loss, beta)
         self.labels = labels
-        if reconstruction_loss == 'bernoulli':
-            self.reconstruction_loss = partial(losses.bernoulli_loss,
-                                                subtract_true_image_entropy=subtract_true_image_entropy)
-        elif reconstruction_loss == 'l2':
-            self.reconstruction_loss = losses.l2_loss
 
     def regularizer(self, kl_loss):
         return self.beta * kl_loss 
@@ -74,8 +68,8 @@ class GroupVAEBase(VAE):
         x_recons_2_max = torch.amax(x_recons_2, dim=(2,3))
 
         #Calculate the reconstruction loss
-        reconstruction_loss_1 = torch.mean(self.reconstruction_loss(features_x1, x_recons_1))
-        reconstruction_loss_2 = torch.mean(self.reconstruction_loss(features_x2, x_recons_2))
+        reconstruction_loss_1 = self.reconstruction_loss(features_x1, x_recons_1)
+        reconstruction_loss_2 = self.reconstruction_loss(features_x2, x_recons_2)
         
         #Doing it this way for numerical stability
         reconstruction_loss = 0.5*reconstruction_loss_1 + 0.5*reconstruction_loss_2

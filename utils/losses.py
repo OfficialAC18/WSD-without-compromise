@@ -1,35 +1,25 @@
 import torch
 import torch.nn.functional as F
 
-def bernoulli_loss(x_true,x_recons,
-                   subtract_true_image_entropy=False):
-    
+def bernoulli_loss(x_true,x_recons):
+
     """
     Computes the Bernoulli Loss between the true image and the reconstructed image
     Args:
         x_true: torch.Tensor, true image
         x_recons: torch.Tensor, reconstructed image
-        activation: torch.nn.Module, activation function
-        subract_true_image_entropy: bool, whether to subtract the entropy of the true image
     Returns:
         loss: torch.Tensor, Bernoulli loss
     """
 
     #Flatten the images
     x_true_reshaped = torch.reshape(x_true, (x_true.shape[0], -1))
-    x_recons_reshaped = torch.reshape(x_recons, (x_recons.shape[0], -1))  
+    x_recons_reshaped = torch.reshape(x_recons, (x_recons.shape[0], -1))
 
-    if subtract_true_image_entropy:
-        dist = torch.distributions.bernoulli.Bernoulli(probs=torch.clamp(x_true_reshaped, 1e-6, 1 - 1e-6))
-        loss_lower_bound = torch.sum(dist.entropy(),dim=1)
-    else:
-        loss_lower_bound = 0
-    
     #Calculate sigmoid cross entropy
-    loss = torch.sum(F.binary_cross_entropy_with_logits(input=F.sigmoid(x_recons_reshaped), target=x_true_reshaped,
-                                            reduction='none'), dim = 1)
-    
-    return loss - loss_lower_bound
+    loss = (F.binary_cross_entropy_with_logits(input=x_recons_reshaped, target=x_true_reshaped, reduction='sum') /
+            x_true.size(0))
+    return loss
 
 
 def l2_loss(x_true,x_recons):
@@ -43,25 +33,25 @@ def l2_loss(x_true,x_recons):
     """
     x_true_reshaped = torch.reshape(x_true, (x_true.shape[0], -1))
     x_recons_reshaped = torch.reshape(torch.nn.Sigmoid()(x_recons), (x_recons.shape[0], -1))
-    loss = torch.mean(F.mse_loss(input=x_recons_reshaped, target=x_true_reshaped, reduction='none'), dim=1)
+    loss = F.mse_loss(input=x_recons_reshaped, target=x_true_reshaped, reduction='sum') / x_true.size(0)
     return loss
 
 
 def compute_gaussian_kl(z_mean, z_logvar):
     """
-    Compute KL diversgence between input Gaussian and standard Gaussian
+    Compute KL divergence between input Gaussian and standard Gaussian
     Args:
         z_mean: torch.Tensor, mean of the Gaussian
         z_logvar: torch.Tensor, log variance of the Gaussian
     Returns:
         kl_loss: torch.Tensor, KL divergence
     """
-    kl_loss = 0.5 * torch.mean(torch.sum(z_mean**2 + torch.exp(z_logvar) - z_logvar - 1, dim=1))
+    kl_loss = -0.5 * torch.sum(1 + z_logvar - z_mean.pow(2) - z_logvar.exp()) / z_mean.size(0)
     return kl_loss
 
 def compute_kl(z_mean_1, z_logvar_1, z_mean_2, z_logvar_2):
     """
-    Compute KL diversgence between two Gaussians
+    Compute KL divergence between two Gaussians
     Args:
         z_mean_1: torch.Tensor, mean of the Gaussian 1
         z_logvar_1: torch.Tensor, log variance of the Gaussian 1

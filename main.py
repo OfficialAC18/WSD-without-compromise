@@ -81,7 +81,7 @@ def main(args):
     elif args.model == 'VAE':
         from models.VAE import VAE
         model = VAE(data_shape=dataset.sampler.data_shape, latent_dim=args.latent_dim,
-                    reconstruction_loss=args.recon_loss,)
+                    reconstruction_loss=args.recon_loss, beta=args.beta)
 
 
     # Setup optimizer
@@ -196,20 +196,24 @@ if __name__ == '__main__':
     args.eval_seed = seed
     # args.aggregate = random.choice(['argmax', 'label'])
     args.aggregate = 'argmax'
-    if args.aggregate == 'argmax':
-        # args.latent_dim = random.choice([6, 10, 20])
-        args.latent_dim = random.choice([6, 20, 100, 1000, 4096])
-    else:
-        args.latent_dim = 6
-    # args.model = random.choice(['G_VAE', 'ML_VAE'])
+    # if args.aggregate == 'argmax':
+    #     args.latent_dim = random.choice([6, 10, 20, 100, 256])
+    # else:
+    #     args.latent_dim = 6
+    args.latent_dim = 10
+    # args.model = random.choice(['VAE', 'G_VAE', 'ML_VAE'])
     args.model = 'VAE'
     args.k_observed = random.choice([1, 2, 3, 4, 5, 6])
-    args.learning_rate = random.choice([1e-2, 1e-3, 1e-4, 1e-5, 1e-6])
-    args.batch_size = random.choice([16, 32, 64, 128])
-    # args.beta = random.choice([0.1, 0.2, 0.5, 1, 2])
-    args.beta = random.choice([0.5, 1, 2, 4, 8])
-    args.num_train_steps = 2000000//args.batch_size
-    args.recon_loss = random.choice(['bernoulli', 'l2'])
+    # args.learning_rate = random.choice([1e-2, 1e-3, 1e-4, 1e-5, 1e-6])
+    args.learning_rate = 0.0001
+    # args.batch_size = random.choice([16, 32, 64, 128])
+    args.batch_size = 64
+    # args.beta = random.choice([0.1, 0.5, 1, 2, 4])
+    args.beta = 1
+    # args.num_train_steps = 5000000//args.batch_size
+    args.num_train_steps = 300000
+    # args.recon_loss = random.choice(['bernoulli', 'l2'])
+    args.recon_loss = 'bernoulli'
     print(args)
     main(args)
     visualize_model(seed, args.model, args.aggregate, args.latent_dim)

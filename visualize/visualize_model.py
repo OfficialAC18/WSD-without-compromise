@@ -18,13 +18,22 @@ def visualize_model(seed, model_name, aggregate, latent_dim):
             model = GroupVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim, labels=True)
         else:
             model = GroupVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim)
-    else:
+    elif model_name == 'ML_VAE':
         if aggregate == 'label':
             model = MLVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim, labels=True)
         else:
             model = MLVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim)
+    elif model_name == 'VAE':
+        from models.VAE import VAE
+        model = VAE(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim)
     model.load_state_dict(torch.load(current_dir + f'/../trained_models/trained_model_{seed}.pth'))
-    reconstructed_tuple = model(images, labels)
+
+    if model_name == 'VAE':
+        recon1 = model(images, labels)[0]
+        recon2 = model(images[:, :, 64:, :], labels)[1]
+        reconstructed_tuple = (recon1, recon2)
+    else:
+        reconstructed_tuple = model(images, labels)
     reconstructed_images = torch.cat((reconstructed_tuple[0], reconstructed_tuple[1]), dim=2)
     reconstructed_images = torch.nn.Sigmoid()(reconstructed_images)
     comparison = torch.cat([images, reconstructed_images], dim=3)
@@ -33,4 +42,4 @@ def visualize_model(seed, model_name, aggregate, latent_dim):
     print(f"Visualization saved as {filename}")
 
 if __name__=='__main__':
-    visualize_model(70008, 'ML_VAE', 'label', 6)
+    visualize_model(41059, 'VAE', 'argmax', 10)
