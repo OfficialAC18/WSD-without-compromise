@@ -33,7 +33,7 @@ def aggregate_max(z_mean, z_logvar,
     Aggregation of representations using maximum KL divergence
 
     The dimensions with the minimum KL divergence are not aggregated. We aggregate
-    the max K dimensions to be aggragated, we adaptively estimate K by using the thereshold.
+    the max K dimensions to be aggragated, we adaptively estimate K by using the threshold.
 
                                 τ=1/2(max δi + min δi)
 
@@ -48,7 +48,7 @@ def aggregate_max(z_mean, z_logvar,
         z_agg: torch.Tensor, aggregated mean
         z_agg_logvar: torch.Tensor, aggregated log variance
     """
-    thereshold = 0.5 * (torch.max(per_point_kl) + torch.min(per_point_kl))
-    z_agg = torch.where(per_point_kl > thereshold, z_mean, new_mean)
-    z_agg_logvar = torch.where(per_point_kl > thereshold, z_logvar, new_logvar)
+    threshold = 0.5 * (torch.max(per_point_kl, dim=1)[0] + torch.min(per_point_kl, dim=1)[0])
+    z_agg = torch.where(per_point_kl > threshold, z_mean, new_mean)
+    z_agg_logvar = torch.where(per_point_kl > threshold, z_logvar, new_logvar)
     return z_agg, z_agg_logvar

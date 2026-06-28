@@ -5,30 +5,31 @@ from torchvision.utils import make_grid, save_image
 
 import torch
 import os
+import logging
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-def visualize_model(seed, model_name, aggregate, latent_dim):
-    filename = f"vis_model_{seed}.png"
-    dsprites = Dsprites(current_dir + '/../datasets/dSprites')
+def visualize_model(args, step):
+    filename = f"vis_model_{args.seed}_{step}.png"
+    dsprites = Dsprites(current_dir + '/../datasets/dSprites', seed=args.seed)
     images, labels = dsprites.sample_paired_observations(num_samples=9)
 
-    if model_name == 'G_VAE':
-        if aggregate == 'label':
-            model = GroupVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim, labels=True)
+    if args.model == 'G_VAE':
+        if args.aggregate == 'label':
+            model = GroupVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim, labels=True)
         else:
-            model = GroupVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim)
-    elif model_name == 'ML_VAE':
-        if aggregate == 'label':
-            model = MLVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim, labels=True)
+            model = GroupVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim)
+    elif args.model == 'ML_VAE':
+        if args.aggregate == 'label':
+            model = MLVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim, labels=True)
         else:
-            model = MLVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim)
-    elif model_name == 'VAE':
+            model = MLVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim)
+    elif args.model == 'VAE':
         from models.VAE import VAE
-        model = VAE(data_shape=torch.Size([1, 64, 64]), latent_dim=latent_dim)
-    model.load_state_dict(torch.load(current_dir + f'/../trained_models/trained_model_{seed}.pth'))
+        model = VAE(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim)
+    model.load_state_dict(torch.load(current_dir + f'/../trained_models/trained_model_{args.seed}_{step}.pth'))
 
-    if model_name == 'VAE':
+    if args.model == 'VAE':
         recon1 = model(images, labels)[0]
         recon2 = model(images[:, :, 64:, :], labels)[1]
         reconstructed_tuple = (recon1, recon2)
@@ -39,7 +40,4 @@ def visualize_model(seed, model_name, aggregate, latent_dim):
     comparison = torch.cat([images, reconstructed_images], dim=3)
     grid = make_grid(comparison, nrow=3, padding=4, pad_value=1.0)
     save_image(grid, current_dir + f'/{filename}')
-    print(f"Visualization saved as {filename}")
-
-if __name__=='__main__':
-    visualize_model(41059, 'VAE', 'argmax', 10)
+    logging.info(f"Visualization for step {step} saved as {filename}")

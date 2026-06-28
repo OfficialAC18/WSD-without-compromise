@@ -54,7 +54,7 @@ class PlayingCardsNoTransform(DisentangledSampler):
         return len(self.observed_latent_factor_indices)
     
     @property
-    def latent_factor_sizes(self):
+    def observed_latent_factor_sizes(self):
         return [self.latent_sizes[i] for i in self.observed_latent_factor_indices]
     
     @property
@@ -81,7 +81,7 @@ class PlayingCardsNoTransform(DisentangledSampler):
     
     def sample_full_latent_vector(self, observed_latent_factors):
         """
-        Sample a batch of remaining latent factors, Y-Y', based on the the latent factors Y'
+        Sample a batch of remaining latent factors, Y-Y', based on the latent factors Y'
         and combine them to form the full latent vector Y
         Args:
             latent_factors: torch.Tensor, The set of latent factors
@@ -142,7 +142,7 @@ class PlayingCardsNoTransform(DisentangledSampler):
         Generate the required paired examples for Weak Disentanglement
         Args:
             num: int, number of examples to generate
-            k: int, number of uncommon factors betweem X1 and X2, if set to -1, it is randomly sampled between 0 and len(observed_latent_factor_indices)
+            k: int, number of uncommon factors between X1 and X2, if set to -1, it is randomly sampled between 0 and len(observed_latent_factor_indices)
             observed_idx: str, 'constant' or 'random', if 'constant', then the k-different factors are the same for all pairs, if 'random', then the k-different factors are randomly sampled for each pair
             return_latents: bool, whether to return the latent factors as well
         

@@ -10,36 +10,33 @@ from data.disentangled import DisentangledDataset
 from torch.utils.data import DataLoader
 from visualize.visualize_model import visualize_model
 
-parser = argparse.ArgumentParser()
+logging.basicConfig(filename='main.log', filemode='a', level=logging.INFO)
 
-parser.add_argument('--model_dir', type=str, required=True, help='Directory to model checkpoints \
-                                                            (models are trained if directory is empty)')
+parser = argparse.ArgumentParser()
+parser.add_argument('--model_dir', type=str, default='trained_models', help='Directory to model checkpoints')
 parser.add_argument('--model_name', type=str, help='Name of the model', default='trained_model')
 parser.add_argument('--latent_dim', type=int, default=10, help='Dimension of the latent space')
 parser.add_argument('--dataset', type=str, default='dSprites', help='Name of the dataset to use')
-parser.add_argument('--pipeline_seed', type=int, default=42, help='Seed for the pipeline')
-parser.add_argument('--eval_seed', type=int, default=42, help='Seed for running evaluation')
+parser.add_argument('--seed', type=int, help='Seed for the pipeline')
 parser.add_argument('--overwrite', action='store_true', help='Overwrite existing model checkpoints')
 parser.add_argument('--model', type=str, default='G_VAE', help='Model to use (VAE, ML_VAE, G_VAE)')
 parser.add_argument('--k_observed', type=int, default=1, help='Number of observed factors')
 parser.add_argument('--observed_idx', type=str, default='random', help='Index of the observed factors')
 parser.add_argument('--aggregate', type=str, default='argmax', help='Aggregation method for the VAE')
 parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer')
-parser.add_argument('--batch_size', type=int, default=52, help='Batch size for training')
+parser.add_argument('--batch_size', type=int, default=64, help='Batch size for training')
 parser.add_argument('--num_train_steps', type=int, default=100000, help='Number of training steps')
 parser.add_argument('--beta', type=float, default=1, help='Weighting of KL loss')
 parser.add_argument('--recon_loss', type=str, default='bernoulli', help='Which reconstruction loss to use')
+parser.add_argument('--checkpoint_freq', type=int, default=10000, help='Checkpoint and visualization frequency')
 
 
 def main(args):
-    if not os.path.exists(args.model_dir) or args.overwrite:
-        os.makedirs(args.model_dir, exist_ok=True)
-        logging.warning(f'Training Models, saving to {args.model_dir}')
-    else:
-        logging.warning(f'Loading models from {args.model_dir}')
+    os.makedirs(args.model_dir, exist_ok=True)
+    model_path = os.path.join(args.model_dir, f'{args.model_name}_{args.seed}')
 
     #Load the relevant sampler
-    sampler = get_dataset(args.dataset, seed=args.pipeline_seed)
+    sampler = get_dataset(args.dataset, seed=args.seed)
 
     #Load the dataset object
     dataset = DisentangledDataset(sampler, observed_idx=args.observed_idx,
@@ -168,18 +165,19 @@ def main(args):
             #     })
             
             # Print detailed progress less frequently
-            if step % 1000 == 0:
+            if step % args.checkpoint_freq == 0:
                 logging.info(f'Step [{step}/{num_training_steps}], Epoch: {epoch}, Loss: {loss.item():.4f}, ELBO: {elbo.item():.4f}')
-            
+                torch.save(model.state_dict(), f'{model_path}_{step}.pth')
+                visualize_model(args, step)
+
             step += 1
-        
+
         epoch += 1
     
     # Close progress bar
     pbar.close()
     
     # Save the trained model
-    model_path = os.path.join(args.model_dir, f'{args.model_name}_{args.pipeline_seed}.pth')
     torch.save(model.state_dict(), model_path)
     print(f'Model saved to {model_path}')
     
@@ -190,33 +188,21 @@ def main(args):
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    seed = random.randint(0, 99999)
-    random.seed(seed)
-    args.pipeline_seed = seed
-    args.eval_seed = seed
-    # args.aggregate = random.choice(['argmax', 'label'])
-    args.aggregate = 'argmax'
-    # if args.aggregate == 'argmax':
-    #     args.latent_dim = random.choice([6, 10, 20, 100, 256])
-    # else:
-    #     args.latent_dim = 6
-    args.latent_dim = 10
-    # args.model = random.choice(['VAE', 'G_VAE', 'ML_VAE'])
-    args.model = 'VAE'
-    args.k_observed = random.choice([1, 2, 3, 4, 5, 6])
-    # args.learning_rate = random.choice([1e-2, 1e-3, 1e-4, 1e-5, 1e-6])
-    args.learning_rate = 0.0001
-    # args.batch_size = random.choice([16, 32, 64, 128])
-    args.batch_size = 64
-    # args.beta = random.choice([0.1, 0.5, 1, 2, 4])
-    args.beta = 1
-    # args.num_train_steps = 5000000//args.batch_size
-    args.num_train_steps = 300000
-    # args.recon_loss = random.choice(['bernoulli', 'l2'])
-    args.recon_loss = 'bernoulli'
-    print(args)
+
+    # Set or configure seed for reproducibility
+    if args.seed:
+        random.seed(args.seed)
+        torch.manual_seed(args.seed)
+    else:
+        # We generate a random number as the seed, so that the experiment run can still be reproduced
+        args.seed = random.randint(0, 100000)
+        random.seed(args.seed)
+        torch.manual_seed(args.seed)
+
+    logging.info(f"====================\nRunning with arguments: {args}")
+    logging.info(f"Using seed {args.seed}")
+
     main(args)
-    visualize_model(seed, args.model, args.aggregate, args.latent_dim)
 
 
 
