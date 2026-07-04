@@ -9,25 +9,10 @@ import logging
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-def visualize_model(args, step):
+def visualize_model(args, step, sampler, model, device):
     filename = f"vis_model_{args.seed}_{step}.png"
-    dsprites = Dsprites(current_dir + '/../datasets/dSprites', seed=args.seed)
-    images, labels = dsprites.sample_paired_observations(num_samples=9)
-
-    if args.model == 'G_VAE':
-        if args.aggregate == 'label':
-            model = GroupVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim, labels=True)
-        else:
-            model = GroupVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim)
-    elif args.model == 'ML_VAE':
-        if args.aggregate == 'label':
-            model = MLVAELabels(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim, labels=True)
-        else:
-            model = MLVAEArgMax(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim)
-    elif args.model == 'VAE':
-        from models.VAE import VAE
-        model = VAE(data_shape=torch.Size([1, 64, 64]), latent_dim=args.latent_dim)
-    model.load_state_dict(torch.load(current_dir + f'/../trained_models/trained_model_{args.seed}_{step}.pth'))
+    images, labels = sampler.sample_paired_observations(num_samples=9)
+    images = images.to(device)
 
     if args.model == 'VAE':
         recon1 = model(images, labels)[0]

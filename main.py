@@ -4,6 +4,8 @@ import torch
 import logging
 import argparse
 import random
+import re
+
 from tqdm import tqdm
 from utils.utils import get_dataset
 from data.disentangled import DisentangledDataset
@@ -80,6 +82,23 @@ def main(args):
         model = VAE(data_shape=dataset.sampler.data_shape, latent_dim=args.latent_dim,
                     reconstruction_loss=args.recon_loss, beta=args.beta)
 
+    step = 0
+    epoch = 0
+
+    # Load model from saved checkpoint
+    if not args.overwrite:
+        # Check if trained model with same path as prefix exists
+        pattern = re.compile(rf"{args.model_name}_{args.seed}_(\d+).pth")
+        highest_step = -1
+        for filename in os.listdir(args.model_dir):
+            match = re.search(pattern, filename)
+            if match:
+                highest_step = max(highest_step, int(match.group(1)))
+        if highest_step >= 0:
+            # We matched a file and load the latest checkpoint
+            model.load_state_dict(torch.load(f"{model_path}_{highest_step}.pth"))
+            step = highest_step
+
 
     # Setup optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate if hasattr(args, 'learning_rate') else 1e-3,
@@ -116,9 +135,6 @@ def main(args):
     # Training loop based on number of steps
     num_training_steps = args.num_train_steps
     model.train()
-    
-    step = 0
-    epoch = 0
     
     # Initialize tqdm progress bar
     pbar = tqdm(total=num_training_steps, desc="Training", unit="step")
@@ -168,7 +184,7 @@ def main(args):
             if step % args.checkpoint_freq == 0:
                 logging.info(f'Step [{step}/{num_training_steps}], Epoch: {epoch}, Loss: {loss.item():.4f}, ELBO: {elbo.item():.4f}')
                 torch.save(model.state_dict(), f'{model_path}_{step}.pth')
-                visualize_model(args, step)
+                visualize_model(args, step, dataset.sampler, model, device)
 
             step += 1
 
@@ -176,10 +192,13 @@ def main(args):
     
     # Close progress bar
     pbar.close()
-    
+
+    # Final visualization
+    visualize_model(args, step, dataset.sampler, model, device)
+
     # Save the trained model
     torch.save(model.state_dict(), model_path)
-    print(f'Model saved to {model_path}')
+    print(f'Model saved to {model_path}_{step}.pth')
     
     # Save model to wandb
     # wandb.save(model_path)
