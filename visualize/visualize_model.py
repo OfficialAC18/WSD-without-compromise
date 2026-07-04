@@ -13,6 +13,7 @@ def visualize_model(args, step, sampler, model, device):
     filename = f"vis_model_{args.seed}_{step}.png"
     images, labels = sampler.sample_paired_observations(num_samples=9)
     images = images.to(device)
+    labels = labels.to(device)
 
     if args.model == 'VAE':
         recon1 = model(images, labels)[0]

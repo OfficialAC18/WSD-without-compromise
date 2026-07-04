@@ -11,7 +11,7 @@ def aggregate_labels(z_mean,z_logvar,
     for each factor of variation in latent dimension (factor 1 -> dim 1, factor 2 -> dim 2 etc.).
 
     Args:
-        z_mean: torch.Tensor, mean of encoder distrbution of original image
+        z_mean: torch.Tensor, mean of encoder distribution of original image
         z_logvar: torch.Tensor, log variance of encoder distribution of original image
         new_mean: torch.Tensor, mean of encoder distributions of pair of images
         new_logvar: torch.Tensor, log variance of encoder distributions of pair of images

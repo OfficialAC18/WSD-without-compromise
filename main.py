@@ -22,7 +22,7 @@ parser.add_argument('--dataset', type=str, default='dSprites', help='Name of the
 parser.add_argument('--seed', type=int, help='Seed for the pipeline')
 parser.add_argument('--overwrite', action='store_true', help='Overwrite existing model checkpoints')
 parser.add_argument('--model', type=str, default='G_VAE', help='Model to use (VAE, ML_VAE, G_VAE)')
-parser.add_argument('--k_observed', type=int, default=1, help='Number of observed factors')
+parser.add_argument('--k', type=int, default=1, help='Number of factors of variation')
 parser.add_argument('--observed_idx', type=str, default='random', help='Index of the observed factors')
 parser.add_argument('--aggregate', type=str, default='argmax', help='Aggregation method for the VAE')
 parser.add_argument('--learning_rate', type=float, default=1e-3, help='Learning rate for the optimizer')
@@ -42,7 +42,7 @@ def main(args):
 
     #Load the dataset object
     dataset = DisentangledDataset(sampler, observed_idx=args.observed_idx,
-                                k_observed=args.k_observed)
+                                k_observed=args.k)
 
     #Load the dataloader
     dataloader = DataLoader(dataset,
@@ -51,7 +51,7 @@ def main(args):
     
     
     #Load the model
-    if args.model == 'ML_VAE':
+    if args.model in ['ML_VAE', 'MLVAE']:
         if args.aggregate == 'argmax':
             from models.ML_VAE import MLVAEArgMax
             model = MLVAEArgMax(data_shape=dataset.sampler.data_shape,
@@ -64,7 +64,7 @@ def main(args):
                                 latent_dim=args.latent_dim, beta = args.beta, reconstruction_loss=args.recon_loss,
                                 num_channels=dataset.sampler.data_shape[0],
                                 labels=True)
-    elif args.model == 'G_VAE':
+    elif args.model in ['G_VAE', 'GVAE']:
         if args.aggregate == 'argmax':
             from models.GVAE import GroupVAEArgMax
             model = GroupVAEArgMax(data_shape=dataset.sampler.data_shape,
@@ -81,6 +81,9 @@ def main(args):
         from models.VAE import VAE
         model = VAE(data_shape=dataset.sampler.data_shape, latent_dim=args.latent_dim,
                     reconstruction_loss=args.recon_loss, beta=args.beta)
+    else:
+        logging.error(f"Incorrect model from arguments: {args.model}. Must be either VAE, ML_VAE or G_VAE. Aborting.")
+        exit(1)
 
     step = 0
     epoch = 0
@@ -137,7 +140,7 @@ def main(args):
     model.train()
     
     # Initialize tqdm progress bar
-    pbar = tqdm(total=num_training_steps, desc="Training", unit="step")
+    pbar = tqdm(total=num_training_steps, initial=step, desc="Training", unit="step")
     
     while step < num_training_steps:
         for batch_data in dataloader:
@@ -182,7 +185,8 @@ def main(args):
             
             # Print detailed progress less frequently
             if step % args.checkpoint_freq == 0:
-                logging.info(f'Step [{step}/{num_training_steps}], Epoch: {epoch}, Loss: {loss.item():.4f}, ELBO: {elbo.item():.4f}')
+                logging.info(f'Step [{step}/{num_training_steps}], Epoch: {epoch}, Loss: {loss.item():.4f}, '
+                             f'ELBO: {elbo.item():.4f}')
                 torch.save(model.state_dict(), f'{model_path}_{step}.pth')
                 visualize_model(args, step, dataset.sampler, model, device)
 
@@ -193,12 +197,11 @@ def main(args):
     # Close progress bar
     pbar.close()
 
-    # Final visualization
-    visualize_model(args, step, dataset.sampler, model, device)
-
-    # Save the trained model
+    # Final log
+    logging.info(
+        f'Step [{step}/{num_training_steps}], Epoch: {epoch}, Loss: {loss.item():.4f}, ELBO: {elbo.item():.4f}')
     torch.save(model.state_dict(), model_path)
-    print(f'Model saved to {model_path}_{step}.pth')
+    visualize_model(args, step, dataset.sampler, model, device)
     
     # Save model to wandb
     # wandb.save(model_path)
